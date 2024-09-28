@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.CheckComboBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.RacePlanner.FXMLController">
+   <center>
+      <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab fx:id="tabMain" text="Principale">
+            <content>
+              <AnchorPane>
+                     <children>
+                        <SplitPane dividerPositions="0.36472945891783565">
+                          <items>
+                            <AnchorPane>
+                                 <children>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <GridPane hgap="20.0" vgap="15.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="Livello di abilità">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label text="Categoria preferita" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Anno" GridPane.rowIndex="2">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Continenti" GridPane.rowIndex="3">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Nazioni" GridPane.rowIndex="4">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Mesi da escludere" GridPane.rowIndex="5">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Gara preferita" GridPane.rowIndex="6">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <ComboBox fx:id="cmbLevel" prefWidth="180.0" GridPane.columnIndex="1" />
+                                                <ComboBox fx:id="cmbCategory" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <ComboBox fx:id="cmbYear" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <CheckComboBox fx:id="ckCmbContinents" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <CheckComboBox fx:id="ckCmbNations" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <CheckComboBox fx:id="ckCmbMonths" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <ComboBox fx:id="cmbFavRace" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                             </children>
+                                          </GridPane>
+                                          <GridPane vgap="15.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="10.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Label text="Numero massimo di gare">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <Label text="Km massimi per gara" GridPane.rowIndex="1">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font></Label>
+                                                <TextField fx:id="txtNMaxRaces" GridPane.columnIndex="1" />
+                                                <TextField fx:id="txtKmMaxRace" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="15.0" />
+                                             </VBox.margin>
+                                          </GridPane>
+                                          <HBox alignment="CENTER" spacing="15.0">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#doResetMain" prefWidth="65.0" text="Reset">
+                                                   <font>
+                                                      <Font name="Arial" size="14.0" />
+                                                   </font></Button>
+                                                <Button mnemonicParsing="false" onAction="#doOpenGuide" prefWidth="65.0" text="Guida">
+                                                   <font>
+                                                      <Font name="Arial" size="14.0" />
+                                                   </font></Button>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="20.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <Label text="Massimizza">
+                                             <VBox.margin>
+                                                <Insets top="25.0" />
+                                             </VBox.margin>
+                                             <font>
+                                                <Font name="Arial" size="16.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox alignment="CENTER" spacing="20.0">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#doMaximizeRaces" prefHeight="30.0" prefWidth="65.0" text="Gare">
+                                                   <font>
+                                                      <Font name="Arial" size="14.0" />
+                                                   </font></Button>
+                                                <Button mnemonicParsing="false" onAction="#doMaximizeKm" prefHeight="30.0" prefWidth="65.0" text="Km">
+                                                   <font>
+                                                      <Font name="Arial" size="14.0" />
+                                                   </font></Button>
+                                                <Button mnemonicParsing="false" onAction="#doMaximizeNations" prefHeight="30.0" text="Nazioni">
+                                                   <font>
+                                                      <Font name="Arial" size="14.0" />
+                                                   </font></Button>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <Label fx:id="lblWarnings" text="Warnings" textFill="RED">
+                                             <VBox.margin>
+                                                <Insets bottom="25.0" top="35.0" />
+                                             </VBox.margin>
+                                             <font>
+                                                <Font size="13.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                       <padding>
+                                          <Insets left="15.0" right="30.0" top="15.0" />
+                                       </padding>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                            <AnchorPane>
+                                 <children>
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <TableView fx:id="tblRaces">
+                                            <columns>
+                                              <TableColumn fx:id="colDate" maxWidth="75.0" prefWidth="75.0" text="Data" />
+                                              <TableColumn fx:id="colPlace" maxWidth="95.0" prefWidth="95.0" text="Luogo" />
+                                                <TableColumn fx:id="colName" maxWidth="240.0" prefWidth="240.0" text="Nome" />
+                                                <TableColumn fx:id="colCategory" maxWidth="65.0" prefWidth="65.0" text="Categoria" />
+                                                <TableColumn fx:id="colKm" maxWidth="65.0" prefWidth="65.0" text="Km" />
+                                                <TableColumn fx:id="colElevGain" maxWidth="65.0" prefWidth="65.0" text="Dislivello" />
+                                            </columns>
+                                          </TableView>
+                                          <TextArea fx:id="txtResult" maxWidth="350.0" prefHeight="150.0">
+                                             <VBox.margin>
+                                                <Insets bottom="20.0" top="25.0" />
+                                             </VBox.margin>
+                                             <font>
+                                                <Font size="13.0" />
+                                             </font>
+                                          </TextArea>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                          </items>
+                        </SplitPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab fx:id="tabLevel" text="Scopri il tuo livello">
+            <content>
+              <AnchorPane>
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label fx:id="lblInstructions" alignment="TOP_LEFT" prefHeight="60.0" prefWidth="700.0" text="Istruzioni">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Pane>
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Gara 1:">
+                                             <font>
+                                                <Font name="Arial" size="13.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <Label text="Anno">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbYearR1" prefWidth="70.0" />
+                                                <Label text="Categoria">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbCatR1" prefWidth="70.0" />
+                                                <Label text="Nazione">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNationR1" prefWidth="105.0" />
+                                                <Label text="Nome">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNameR1" prefWidth="180.0" />
+                                                <Label text="Tempo">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtTimeR1" prefWidth="100.0" promptText="HH:mm:ss" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Pane>
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Gara 2:">
+                                             <font>
+                                                <Font name="Arial" size="13.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <Label text="Anno">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbYearR2" prefWidth="70.0" />
+                                                <Label text="Categoria">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbCatR2" prefWidth="70.0" />
+                                                <Label text="Nazione">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNationR2" prefWidth="105.0" />
+                                                <Label text="Nome">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNameR2" prefWidth="180.0" />
+                                                <Label text="Tempo">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtTimeR2" prefWidth="100.0" promptText="HH:mm:ss" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Pane>
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Gara 3:">
+                                             <font>
+                                                <Font name="Arial" size="13.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <Label text="Anno">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbYearR3" prefWidth="70.0" />
+                                                <Label text="Categoria">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbCatR3" prefWidth="70.0" />
+                                                <Label text="Nazione">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNationR3" prefWidth="105.0" />
+                                                <Label text="Nome">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNameR3" prefWidth="180.0" />
+                                                <Label text="Tempo">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtTimeR3" prefWidth="100.0" promptText="HH:mm:ss" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Pane>
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Gara 4:">
+                                             <font>
+                                                <Font name="Arial" size="13.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <Label text="Anno">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbYearR4" prefWidth="70.0" />
+                                                <Label text="Categoria">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbCatR4" prefWidth="70.0" />
+                                                <Label text="Nazione">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNationR4" prefWidth="105.0" />
+                                                <Label text="Nome">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNameR4" prefWidth="180.0" />
+                                                <Label text="Tempo">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtTimeR4" prefWidth="100.0" promptText="HH:mm:ss" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Pane>
+                                 <children>
+                                    <VBox>
+                                       <children>
+                                          <Label text="Gara 5:">
+                                             <font>
+                                                <Font name="Arial" size="13.0" />
+                                             </font>
+                                          </Label>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <Label text="Anno">
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbYearR5" prefWidth="70.0" />
+                                                <Label text="Categoria">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbCatR5" prefWidth="70.0" />
+                                                <Label text="Nazione">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNationR5" prefWidth="105.0" />
+                                                <Label text="Nome">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <ComboBox fx:id="cmbNameR5" prefWidth="180.0" />
+                                                <Label text="Tempo">
+                                                   <HBox.margin>
+                                                      <Insets left="5.0" />
+                                                   </HBox.margin>
+                                                   <font>
+                                                      <Font name="Arial" size="13.0" />
+                                                   </font>
+                                                </Label>
+                                                <TextField fx:id="txtTimeR5" prefWidth="100.0" promptText="HH:mm:ss" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets left="10.0" top="10.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="20.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <VBox alignment="TOP_CENTER">
+                                 <children>
+                                    <HBox alignment="CENTER" spacing="20.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#doResetLevel" prefHeight="30.0" prefWidth="65.0" text="Reset">
+                                             <font>
+                                                <Font name="Arial" size="14.0" />
+                                             </font>
+                                          </Button>
+                                          <Button mnemonicParsing="false" onAction="#doFindLevel" prefHeight="30.0" text="Scopri il tuo livello">
+                                             <font>
+                                                <Font name="Arial" size="14.0" />
+                                             </font>
+                                          </Button>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="30.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <Label fx:id="lblLevel" text="Livello">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font name="Arial" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#doSave" prefHeight="30.0" text="Salva">
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font name="Arial" size="14.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="40.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+   <top>
+      <ImageView fitHeight="90.0" fitWidth="964.0" pickOnBounds="true" preserveRatio="true">
+         <BorderPane.margin>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </BorderPane.margin></ImageView>
+   </top>
+</BorderPane>
