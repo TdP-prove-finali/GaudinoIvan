@@ -1,7 +1,13 @@
 package it.polito.tdp.RacePlanner;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -30,37 +36,37 @@ public class FXMLController {
     private Button btnSave;
 
     @FXML
-    private CheckComboBox<?> ckCmbContinents;
+    private CheckComboBox<String> ckCmbContinents;
 
     @FXML
-    private CheckComboBox<?> ckCmbMonths;
+    private CheckComboBox<String> ckCmbMonths;
 
     @FXML
-    private CheckComboBox<?> ckCmbNations;
+    private CheckComboBox<String> ckCmbNations;
 
     @FXML
-    private ComboBox<?> cmbCatR1;
+    private ComboBox<String> cmbCatR1;
 
     @FXML
-    private ComboBox<?> cmbCatR2;
+    private ComboBox<String> cmbCatR2;
 
     @FXML
-    private ComboBox<?> cmbCatR3;
+    private ComboBox<String> cmbCatR3;
 
     @FXML
-    private ComboBox<?> cmbCatR4;
+    private ComboBox<String> cmbCatR4;
 
     @FXML
-    private ComboBox<?> cmbCatR5;
+    private ComboBox<String> cmbCatR5;
 
     @FXML
-    private ComboBox<?> cmbCategory;
+    private ComboBox<String> cmbCategory;
 
     @FXML
     private ComboBox<?> cmbFavRace;
 
     @FXML
-    private ComboBox<?> cmbLevel;
+    private ComboBox<String> cmbLevel;
 
     @FXML
     private ComboBox<?> cmbNameR1;
@@ -78,40 +84,40 @@ public class FXMLController {
     private ComboBox<?> cmbNameR5;
 
     @FXML
-    private ComboBox<?> cmbNationR1;
+    private ComboBox<String> cmbNationR1;
 
     @FXML
-    private ComboBox<?> cmbNationR2;
+    private ComboBox<String> cmbNationR2;
 
     @FXML
-    private ComboBox<?> cmbNationR3;
+    private ComboBox<String> cmbNationR3;
 
     @FXML
-    private ComboBox<?> cmbNationR4;
+    private ComboBox<String> cmbNationR4;
 
     @FXML
-    private ComboBox<?> cmbNationR5;
+    private ComboBox<String> cmbNationR5;
 
     @FXML
-    private ComboBox<?> cmbYear;
+    private ComboBox<Integer> cmbYear;
 
     @FXML
-    private ComboBox<?> cmbYearR1;
+    private ComboBox<Integer> cmbYearR1;
 
     @FXML
-    private ComboBox<?> cmbYearR2;
+    private ComboBox<Integer> cmbYearR2;
 
     @FXML
-    private ComboBox<?> cmbYearR3;
+    private ComboBox<Integer> cmbYearR3;
 
     @FXML
-    private ComboBox<?> cmbYearR4;
+    private ComboBox<Integer> cmbYearR4;
 
     @FXML
-    private ComboBox<?> cmbYearR5;
+    private ComboBox<Integer> cmbYearR5;
 
     @FXML
-    private TableColumn<?, ?> colCategory;
+    private TableColumn<?, String> colCategory;
 
     @FXML
     private TableColumn<?, ?> colDate;
@@ -123,10 +129,10 @@ public class FXMLController {
     private TableColumn<?, ?> colKm;
 
     @FXML
-    private TableColumn<?, ?> colName;
+    private TableColumn<?, String> colName;
 
     @FXML
-    private TableColumn<?, ?> colPlace;
+    private TableColumn<?, String> colPlace;
 
     @FXML
     private Label lblInstructions;
@@ -209,6 +215,59 @@ public class FXMLController {
     void doSave(ActionEvent event) {
 
     }
+    
+    @FXML
+    void handleCmbLevel(ActionEvent event) {
+    	String livello = cmbLevel.getValue();
+    	switch(livello) {
+    	case "Principiante":
+    		cmbCategory.getItems().clear();
+    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K"));
+    		break;
+    		
+    	case "Intermedio":
+    		cmbCategory.getItems().clear();
+    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K"));
+    		break;
+    		
+    	case "Esperto":
+    		cmbCategory.getItems().clear();
+    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K","100M"));
+    		break;
+    	}
+    }
+    
+    @FXML
+    void handleCmbAction(ActionEvent event) {
+    	if(cmbLevel.getValue()!=null && cmbCategory.getValue()!=null && cmbYear.getValue()!=null) {
+    		if(ckCmbContinents.getCheckModel().getCheckedItems().isEmpty()) {
+    			lblWarnings.setText("nessun continente selezionato");
+    		} else {
+    			lblWarnings.setText("posso aggiungere, con continente");
+    		}	
+    	} else {
+    		lblWarnings.setText("errore devi compilare tutto");
+    	}
+    }
+    
+    // gestisco il riempimento di ckCmbNations in base alla selezione su ckCmbContinents
+    private void handleCkCmbContinents() {
+    	ckCmbNations.getItems().clear();
+    	List<String> continentiSelezionati = ckCmbContinents.getCheckModel().getCheckedItems();
+    	List<String> nazioniDiContinente = new ArrayList<>();
+    	if(!continentiSelezionati.isEmpty()) {
+    		for(String continente : continentiSelezionati) {
+    			//ckCmbNations.getItems().addAll(model.getCountriesByContinent(continente));
+    			nazioniDiContinente.addAll(model.getCountriesByContinent(continente));
+    			// continente qui è il nome, ho modificato la query nel DAO (FUNZIONA)
+    			// conviene ordinare in ordine alfabetico, l'ho fatto qui (FUNZIONA)
+        	}
+    		Collections.sort(nazioniDiContinente);
+    		ckCmbNations.getItems().addAll(nazioniDiContinente);
+    	} else {
+    		ckCmbNations.getItems().addAll(model.getCountries());
+    	}
+    }
 
     @FXML
     void initialize() {
@@ -260,11 +319,51 @@ public class FXMLController {
         assert txtTimeR3 != null : "fx:id=\"txtTimeR3\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtTimeR4 != null : "fx:id=\"txtTimeR4\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtTimeR5 != null : "fx:id=\"txtTimeR5\" was not injected: check your FXML file 'Scene.fxml'.";
+        
+        List<String> livelliAbilita = new ArrayList<>();
+        livelliAbilita.addAll(Arrays.asList("Principiante", "Intermedio", "Esperto"));
+        cmbLevel.getItems().addAll(livelliAbilita);
+        
+        List<String> categorie = new ArrayList<>();
+        categorie.addAll(Arrays.asList("20K", "50K", "100K", "100M"));
+        cmbCategory.getItems().addAll(categorie);
+        cmbCatR1.getItems().addAll(categorie);
+        cmbCatR2.getItems().addAll(categorie);
+        cmbCatR3.getItems().addAll(categorie);
+        cmbCatR4.getItems().addAll(categorie);
+        cmbCatR5.getItems().addAll(categorie);
+        
+        List<String> mesi = new ArrayList<>();
+        mesi.addAll(Arrays.asList("Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",
+        		"Settembre", "Ottobre", "Novembre", "Dicembre"));
+        ckCmbMonths.getItems().addAll(mesi);
+        
+        ckCmbContinents.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> change) {
+                handleCmbAction(null);
+                handleCkCmbContinents();
+            }
+        });
 
     }
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	cmbYear.getItems().addAll(model.getYears());
+    	cmbYearR1.getItems().addAll(model.getYears());
+    	cmbYearR2.getItems().addAll(model.getYears());
+    	cmbYearR3.getItems().addAll(model.getYears());
+    	cmbYearR4.getItems().addAll(model.getYears());
+    	cmbYearR5.getItems().addAll(model.getYears());
+    	ckCmbContinents.getItems().addAll(model.getContinents());
+    	ckCmbNations.getItems().addAll(model.getCountries());
+    	cmbNationR1.getItems().addAll(model.getCountries());
+    	cmbNationR2.getItems().addAll(model.getCountries());
+    	cmbNationR3.getItems().addAll(model.getCountries());
+    	cmbNationR4.getItems().addAll(model.getCountries());
+    	cmbNationR5.getItems().addAll(model.getCountries());
     }
 
 }
