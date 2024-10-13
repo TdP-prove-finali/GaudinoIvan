@@ -88,7 +88,7 @@
                                                 <CheckComboBox fx:id="ckCmbContinents" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                 <CheckComboBox fx:id="ckCmbNations" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                 <CheckComboBox fx:id="ckCmbMonths" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                <ComboBox fx:id="cmbFavRace" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                <ComboBox fx:id="cmbFavRace" disable="true" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                              </children>
                                           </GridPane>
                                           <GridPane vgap="15.0">

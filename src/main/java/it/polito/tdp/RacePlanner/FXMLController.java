@@ -1,6 +1,7 @@
 package it.polito.tdp.RacePlanner;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,9 +19,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+
 import org.controlsfx.control.CheckComboBox;
 
 import it.polito.tdp.RacePlanner.model.Model;
+import it.polito.tdp.RacePlanner.model.Race;
 
 public class FXMLController {
 	
@@ -63,25 +67,25 @@ public class FXMLController {
     private ComboBox<String> cmbCategory;
 
     @FXML
-    private ComboBox<?> cmbFavRace;
+    private ComboBox<Race> cmbFavRace;
 
     @FXML
     private ComboBox<String> cmbLevel;
 
     @FXML
-    private ComboBox<?> cmbNameR1;
+    private ComboBox<Race> cmbNameR1;
 
     @FXML
-    private ComboBox<?> cmbNameR2;
+    private ComboBox<Race> cmbNameR2;
 
     @FXML
-    private ComboBox<?> cmbNameR3;
+    private ComboBox<Race> cmbNameR3;
 
     @FXML
-    private ComboBox<?> cmbNameR4;
+    private ComboBox<Race> cmbNameR4;
 
     @FXML
-    private ComboBox<?> cmbNameR5;
+    private ComboBox<Race> cmbNameR5;
 
     @FXML
     private ComboBox<String> cmbNationR1;
@@ -117,22 +121,22 @@ public class FXMLController {
     private ComboBox<Integer> cmbYearR5;
 
     @FXML
-    private TableColumn<?, String> colCategory;
+    private TableColumn<Race, String> colCategory;
 
     @FXML
-    private TableColumn<?, ?> colDate;
+    private TableColumn<Race, LocalDate> colDate;
 
     @FXML
-    private TableColumn<?, ?> colElevGain;
+    private TableColumn<Race, Integer> colElevGain;
 
     @FXML
-    private TableColumn<?, ?> colKm;
+    private TableColumn<Race, Double> colKm;
 
     @FXML
-    private TableColumn<?, String> colName;
+    private TableColumn<Race, String> colName;
 
     @FXML
-    private TableColumn<?, String> colPlace;
+    private TableColumn<Race, String> colPlace;
 
     @FXML
     private Label lblInstructions;
@@ -150,7 +154,7 @@ public class FXMLController {
     private Tab tabMain;
 
     @FXML
-    private TableView<?> tblRaces;
+    private TableView<Race> tblRaces;
 
     @FXML
     private TextField txtKmMaxRace;
@@ -203,12 +207,46 @@ public class FXMLController {
 
     @FXML
     void doResetLevel(ActionEvent event) {
-
+    	cmbYearR1.setValue(null);
+    	cmbYearR2.setValue(null);
+    	cmbYearR3.setValue(null);
+    	cmbYearR4.setValue(null);
+    	cmbYearR5.setValue(null);
+    	cmbCatR1.setValue(null);
+    	cmbCatR2.setValue(null);
+    	cmbCatR3.setValue(null);
+    	cmbCatR4.setValue(null);
+    	cmbCatR5.setValue(null);
+    	cmbNationR1.setValue(null);
+    	cmbNationR2.setValue(null);
+    	cmbNationR3.setValue(null);
+    	cmbNationR4.setValue(null);
+    	cmbNationR5.setValue(null);
+    	cmbNameR1.setValue(null);
+    	cmbNameR2.setValue(null);
+    	cmbNameR3.setValue(null);
+    	cmbNameR4.setValue(null);
+    	cmbNameR5.setValue(null);
+    	txtTimeR1.clear();
+    	txtTimeR2.clear();
+    	txtTimeR3.clear();
+    	txtTimeR4.clear();
+    	txtTimeR5.clear();
     }
 
     @FXML
     void doResetMain(ActionEvent event) {
-
+    	cmbLevel.setValue(null);
+    	cmbCategory.setValue(null);
+    	cmbYear.setValue(null);
+    	ckCmbContinents.getCheckModel().clearChecks();
+    	ckCmbNations.getCheckModel().clearChecks();
+    	ckCmbMonths.getCheckModel().clearChecks();
+    	cmbFavRace.setValue(null);
+    	txtNMaxRaces.clear();
+    	txtKmMaxRace.clear();
+    	//lblWarnings.setText("");
+    	//resetto anche la table e txtResult?
     }
 
     @FXML
@@ -216,54 +254,78 @@ public class FXMLController {
 
     }
     
+    // gestisco cmbCategory in base alla selezione su cmbLevel
     @FXML
     void handleCmbLevel(ActionEvent event) {
     	String livello = cmbLevel.getValue();
-    	switch(livello) {
-    	case "Principiante":
-    		cmbCategory.getItems().clear();
-    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K"));
-    		break;
+    	if(livello!=null) {
+    		/*switch(livello) {
+        	case "Principiante":
+        		cmbCategory.getItems().clear();
+        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K"));
+        		break;
+        		
+        	case "Intermedio":
+        		cmbCategory.getItems().clear();
+        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K"));
+        		break;
+        		
+        	case "Esperto":
+        		cmbCategory.getItems().clear();
+        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K","100M"));
+        		break;
+        	}*/
     		
-    	case "Intermedio":
     		cmbCategory.getItems().clear();
-    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K"));
-    		break;
-    		
-    	case "Esperto":
-    		cmbCategory.getItems().clear();
-    		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K","100M"));
-    		break;
+    		cmbCategory.getItems().addAll(model.getAtleta(livello).getCategorieValide());
     	}
     }
     
+    // gestisco cmbFavRace in base agli elementi selezionati
+    // forse per cmbCategory non serve monitorare questo evento, CONTROLLARE
     @FXML
     void handleCmbAction(ActionEvent event) {
-    	if(cmbLevel.getValue()!=null && cmbCategory.getValue()!=null && cmbYear.getValue()!=null) {
-    		if(ckCmbContinents.getCheckModel().getCheckedItems().isEmpty()) {
+    	cmbFavRace.getItems().clear();
+    	String lvl = cmbLevel.getValue();
+    	Integer anno = cmbYear.getValue(); 
+    	// devo risolvere bug 
+    	if(lvl!=null && anno!=null) {
+    		cmbFavRace.setDisable(false);
+    		/*if(ckCmbContinents.getCheckModel().getCheckedItems().isEmpty()) {
     			lblWarnings.setText("nessun continente selezionato");
     		} else {
     			lblWarnings.setText("posso aggiungere, con continente");
-    		}	
+    		}*/
+    		String favCat = cmbCategory.getValue();
+    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
+    		List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
+        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+    		List<Race> racesFiltered = model.getRacesByFilters(lvl, favCat, anno, continenti, nazioni, mesiNo);
+    		cmbFavRace.getItems().addAll(racesFiltered);
+    		
     	} else {
-    		lblWarnings.setText("errore devi compilare tutto");
+    		cmbFavRace.setDisable(true);
+    		// forse devo anche resettare la scelta
+    		lblWarnings.setText("livello o anno null"); //solo per controllo, DA TOGLIERE
     	}
     }
     
-    // gestisco il riempimento di ckCmbNations in base alla selezione su ckCmbContinents
+    // gestisco ckCmbNations in base alla selezione su ckCmbContinents
     private void handleCkCmbContinents() {
     	ckCmbNations.getItems().clear();
     	List<String> continentiSelezionati = ckCmbContinents.getCheckModel().getCheckedItems();
     	List<String> nazioniDiContinente = new ArrayList<>();
-    	if(!continentiSelezionati.isEmpty()) {
+    	// la 2a condizione risolve un bug delle CheckComboBox
+    	if(!continentiSelezionati.isEmpty() && !continentiSelezionati.contains("null")) {
     		for(String continente : continentiSelezionati) {
     			//ckCmbNations.getItems().addAll(model.getCountriesByContinent(continente));
     			nazioniDiContinente.addAll(model.getCountriesByContinent(continente));
-    			// continente qui è il nome, ho modificato la query nel DAO (FUNZIONA)
-    			// conviene ordinare in ordine alfabetico, l'ho fatto qui (FUNZIONA)
+    			// continente qui è il nome, ho modificato la query nel DAO (OK)
+    			// conviene ordinare in ordine alfabetico, l'ho fatto qui (OK)
         	}
     		Collections.sort(nazioniDiContinente);
     		ckCmbNations.getItems().addAll(nazioniDiContinente);
+    		
     	} else {
     		ckCmbNations.getItems().addAll(model.getCountries());
     	}
@@ -320,6 +382,13 @@ public class FXMLController {
         assert txtTimeR4 != null : "fx:id=\"txtTimeR4\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtTimeR5 != null : "fx:id=\"txtTimeR5\" was not injected: check your FXML file 'Scene.fxml'.";
         
+        colDate.setCellValueFactory(new PropertyValueFactory<Race, LocalDate>("date"));
+        colPlace.setCellValueFactory(new PropertyValueFactory<Race, String>("rawLocation"));
+        colName.setCellValueFactory(new PropertyValueFactory<Race, String>("raceTitle"));
+        colCategory.setCellValueFactory(new PropertyValueFactory<Race, String>("raceCategory"));
+        colKm.setCellValueFactory(new PropertyValueFactory<Race, Double>("distance"));
+        colElevGain.setCellValueFactory(new PropertyValueFactory<Race, Integer>("elevationGain"));
+        
         List<String> livelliAbilita = new ArrayList<>();
         livelliAbilita.addAll(Arrays.asList("Principiante", "Intermedio", "Esperto"));
         cmbLevel.getItems().addAll(livelliAbilita);
@@ -338,11 +407,28 @@ public class FXMLController {
         		"Settembre", "Ottobre", "Novembre", "Dicembre"));
         ckCmbMonths.getItems().addAll(mesi);
         
+        // monitora le modifiche negli elementi selezionati dell'oggetto ckCmbContinents
         ckCmbContinents.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
             @Override
             public void onChanged(Change<? extends String> change) {
                 handleCmbAction(null);
                 handleCkCmbContinents();
+            }
+        });
+        
+        // monitora le modifiche negli elementi selezionati dell'oggetto ckCmbNations
+        ckCmbNations.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> change) {
+                handleCmbAction(null);
+            }
+        });
+        
+        // monitora le modifiche negli elementi selezionati dell'oggetto ckCmbMonths
+        ckCmbMonths.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
+            @Override
+            public void onChanged(Change<? extends String> change) {
+                handleCmbAction(null);
             }
         });
 
