@@ -1,9 +1,14 @@
 package it.polito.tdp.RacePlanner.model;
 
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import it.polito.tdp.RacePlanner.db.RacePlannerDAO;
@@ -12,6 +17,7 @@ public class Model {
 	
 	private RacePlannerDAO dao;
 	//private Map<String, String> mapContinents;
+	private Map<Month, String> mapMonths;
 	private Atleta principiante;
 	private Atleta intermedio;
 	private Atleta esperto;
@@ -20,7 +26,14 @@ public class Model {
 		this.dao = new RacePlannerDAO();
 		//mapContinents = new HashMap<>();
 		
-		//creo atleta principiante
+		// creo mappa mesi
+		this.mapMonths = new LinkedHashMap<>();
+		for(Month month : Month.values()) {
+			String mese = month.getDisplayName(TextStyle.FULL, Locale.ITALIAN);
+			mapMonths.put(month, mese);
+		}
+		
+		// creo atleta principiante
 		List<String> categoriePrincipiante = Arrays.asList("20K","50K"); //lista fissa non modificabile
 		//List<String> categoriePrincipiante = new ArrayList<>(Arrays.asList("20K","50K"));
 		Map<String, Integer> giorniPrincipiante = new HashMap<>();
@@ -28,7 +41,7 @@ public class Model {
 		giorniPrincipiante.put("50K", 70);
 		this.principiante = new Atleta("Principiante", categoriePrincipiante, giorniPrincipiante);
 		
-		//creo atleta intermedio
+		// creo atleta intermedio
 		List<String> categorieIntermedio = Arrays.asList("20K","50K","100K"); //lista fissa non modificabile
 		Map<String, Integer> giorniIntermedio = new HashMap<>();
 		giorniPrincipiante.put("20K", 25);
@@ -36,7 +49,7 @@ public class Model {
 		giorniPrincipiante.put("100K", 70);
 		this.intermedio = new Atleta("Intermedio", categorieIntermedio, giorniIntermedio);
 		
-		//creo atleta esperto
+		// creo atleta esperto
 		List<String> categorieEsperto = Arrays.asList("20K","50K","100K","100M"); //lista fissa non modificabile
 		Map<String, Integer> giorniEsperto = new HashMap<>();
 		giorniEsperto.put("20K", 15);
@@ -44,6 +57,15 @@ public class Model {
 		giorniEsperto.put("100K", 40);
 		giorniEsperto.put("100M", 70);
 		this.esperto = new Atleta("Esperto", categorieEsperto, giorniEsperto);
+	}
+	
+	// servono i controlli?
+	public List<String> getMesi() {
+		if(this.mapMonths!=null && !this.mapMonths.keySet().isEmpty()) {
+			List<String> mesi = new ArrayList<>(this.mapMonths.values());
+			return mesi;
+		}
+		return null;
 	}
 	
 	public List<Integer> getYears() {
@@ -103,11 +125,29 @@ public class Model {
 	public List<Race> getRacesByFilters(String lvl, String favCat, Integer anno, List<String> continenti,
 			List<String> nazioni, List<String> mesiNo) {
 		List<String> categorie = this.getAtleta(lvl).getCategorieValide();
-		
 		List<Race> gare = dao.getRacesByFilters(anno, favCat, categorie, continenti, nazioni);
-		//devo escludere mesiNO (forse meglio mettere oggetti Month nel controller)
-		//devo ordinare per nome
+		
+		if(mesiNo!=null && !mesiNo.isEmpty()) {
+			List<Race> gareFiltered = new ArrayList<>();
+			for(Race gara : gare) {
+				if(!mesiNo.contains(this.mapMonths.get(gara.getDate().getMonth()))) {
+					gareFiltered.add(gara);
+				}
+			}
+			Collections.sort(gareFiltered);
+			System.out.println(gareFiltered.size());
+			return gareFiltered;
+		}
+		
+		Collections.sort(gare);
+		System.out.println(gare.size());
 		return gare;
+	}
+
+	public List<Race> massimizza(String lvl, String favCat, Integer anno, List<String> continenti, 
+			List<String> nazioni, List<String> mesiNo, Race favRace, int maxGare, double maxKm) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

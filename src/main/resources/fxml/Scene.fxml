@@ -158,9 +158,9 @@
                                                 <Insets top="10.0" />
                                              </VBox.margin>
                                           </HBox>
-                                          <Label fx:id="lblWarnings" textFill="RED">
+                                          <Label fx:id="lblWarnings" alignment="TOP_CENTER" maxWidth="280.0" textAlignment="CENTER" textFill="RED" wrapText="true">
                                              <VBox.margin>
-                                                <Insets bottom="25.0" top="35.0" />
+                                                <Insets bottom="35.0" top="25.0" />
                                              </VBox.margin>
                                              <font>
                                                 <Font size="13.0" />

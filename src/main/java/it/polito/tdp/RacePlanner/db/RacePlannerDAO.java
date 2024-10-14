@@ -222,6 +222,7 @@ public class RacePlannerDAO {
 		return result;
 	}
 
+	// converte il numero di giorni contati dal 01-01 dell'anno year alla data corrispondente
 	private LocalDate dateFromNumDays(int year, int day) {
 		LocalDate inizio = LocalDate.of(year, 1, 1);
 		LocalDate data = inizio.plusDays(day);

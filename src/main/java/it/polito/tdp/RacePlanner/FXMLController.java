@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -187,17 +188,63 @@ public class FXMLController {
 
     @FXML
     void doMaximizeKm(ActionEvent event) {
-
+    	txtResult.clear();
+    	if(cmbLevel.getValue()!=null && cmbYear.getValue()!=null) {
+    		
+    	} else {
+    		lblWarnings.setText("Attenzione: seleziona almeno il livello di abilità e l'anno per proseguire");
+    	}
     }
 
     @FXML
     void doMaximizeNations(ActionEvent event) {
-
+    	txtResult.clear();
+    	if(cmbLevel.getValue()!=null && cmbYear.getValue()!=null) {
+    		
+    	} else {
+    		lblWarnings.setText("Attenzione: seleziona almeno il livello di abilità e l'anno per proseguire");
+    	}
     }
 
     @FXML
     void doMaximizeRaces(ActionEvent event) {
-
+    	txtResult.clear();
+    	String lvl = cmbLevel.getValue();
+    	Integer anno = cmbYear.getValue();
+    	
+    	if(lvl!=null && anno!=null) {
+    		String favCat = cmbCategory.getValue();
+    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
+        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
+        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+        	Race favRace = cmbFavRace.getValue();
+        	
+        	int maxGare;
+        	try {
+        		maxGare = Integer.parseInt(txtNMaxRaces.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Numero massimo di gare\" non valido");
+        		return;
+        	}
+        	
+        	double maxKm;
+        	try {
+        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido");
+        		return;
+        	}
+        	
+    		List<Race> racePlan = model.massimizza(lvl, favCat, anno, continenti, nazioni, mesiNo, favRace, maxGare, maxKm);
+    		if(racePlan!=null && !racePlan.isEmpty()) {
+    			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    		} else {
+    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); //DA MODIFICARE
+    		}
+    		
+    	} else {
+    		lblWarnings.setText("Attenzione: seleziona almeno il livello di abilità e l'anno per proseguire");
+    	}
     }
 
     @FXML
@@ -245,7 +292,7 @@ public class FXMLController {
     	cmbFavRace.setValue(null);
     	txtNMaxRaces.clear();
     	txtKmMaxRace.clear();
-    	//lblWarnings.setText("");
+    	lblWarnings.setText("");
     	//resetto anche la table e txtResult?
     }
 
@@ -254,7 +301,7 @@ public class FXMLController {
 
     }
     
-    // gestisco cmbCategory in base alla selezione su cmbLevel
+    // gestisco l'azione di modifica selezione su cmbLevel
     @FXML
     void handleCmbLevel(ActionEvent event) {
     	String livello = cmbLevel.getValue();
@@ -278,44 +325,39 @@ public class FXMLController {
     		
     		cmbCategory.getItems().clear();
     		cmbCategory.getItems().addAll(model.getAtleta(livello).getCategorieValide());
+    		this.handleCmbAction(event);
     	}
     }
     
-    // gestisco cmbFavRace in base agli elementi selezionati
+    // gestisco cmbFavRace in base ai valori selezionati
     // forse per cmbCategory non serve monitorare questo evento, CONTROLLARE
     @FXML
     void handleCmbAction(ActionEvent event) {
     	cmbFavRace.getItems().clear();
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue(); 
-    	// devo risolvere bug 
-    	if(lvl!=null && anno!=null) {
+    	List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
+    	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
+    	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+    	// le condizioni sulle CheckComboBox risolvono un bug della libreria ControlsFX
+    	if(lvl!=null && anno!=null && !continenti.contains("null") 
+    			&& !nazioni.contains("null") && !mesiNo.contains("null")) {
     		cmbFavRace.setDisable(false);
-    		/*if(ckCmbContinents.getCheckModel().getCheckedItems().isEmpty()) {
-    			lblWarnings.setText("nessun continente selezionato");
-    		} else {
-    			lblWarnings.setText("posso aggiungere, con continente");
-    		}*/
     		String favCat = cmbCategory.getValue();
-    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
-    		List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
-        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
     		List<Race> racesFiltered = model.getRacesByFilters(lvl, favCat, anno, continenti, nazioni, mesiNo);
     		cmbFavRace.getItems().addAll(racesFiltered);
     		
     	} else {
     		cmbFavRace.setDisable(true);
-    		// forse devo anche resettare la scelta
-    		lblWarnings.setText("livello o anno null"); //solo per controllo, DA TOGLIERE
     	}
     }
     
-    // gestisco ckCmbNations in base alla selezione su ckCmbContinents
+    // gestisco l'azione di modifica selezione su cmbContinents
     private void handleCkCmbContinents() {
     	ckCmbNations.getItems().clear();
     	List<String> continentiSelezionati = ckCmbContinents.getCheckModel().getCheckedItems();
     	List<String> nazioniDiContinente = new ArrayList<>();
-    	// la 2a condizione risolve un bug delle CheckComboBox
+    	// la condizione sulla CheckComboBox risolve un bug della libreria ControlsFX
     	if(!continentiSelezionati.isEmpty() && !continentiSelezionati.contains("null")) {
     		for(String continente : continentiSelezionati) {
     			//ckCmbNations.getItems().addAll(model.getCountriesByContinent(continente));
@@ -402,10 +444,10 @@ public class FXMLController {
         cmbCatR4.getItems().addAll(categorie);
         cmbCatR5.getItems().addAll(categorie);
         
-        List<String> mesi = new ArrayList<>();
-        mesi.addAll(Arrays.asList("Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",
-        		"Settembre", "Ottobre", "Novembre", "Dicembre"));
-        ckCmbMonths.getItems().addAll(mesi);
+//        List<String> mesi = new ArrayList<>();
+//        mesi.addAll(Arrays.asList("Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",
+//        		"Settembre", "Ottobre", "Novembre", "Dicembre"));
+//        ckCmbMonths.getItems().addAll(mesi);
         
         // monitora le modifiche negli elementi selezionati dell'oggetto ckCmbContinents
         ckCmbContinents.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {
@@ -450,6 +492,7 @@ public class FXMLController {
     	cmbNationR3.getItems().addAll(model.getCountries());
     	cmbNationR4.getItems().addAll(model.getCountries());
     	cmbNationR5.getItems().addAll(model.getCountries());
+    	ckCmbMonths.getItems().addAll(model.getMesi());
     }
 
 }

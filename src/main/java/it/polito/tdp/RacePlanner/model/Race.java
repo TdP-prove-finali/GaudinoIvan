@@ -2,7 +2,7 @@ package it.polito.tdp.RacePlanner.model;
 
 import java.time.LocalDate;
 
-public class Race {
+public class Race implements Comparable<Race>{
 	
 	private Integer raceUID;
 	private Integer year;
@@ -205,5 +205,10 @@ public class Race {
 	@Override
 	public String toString() {
 		return raceTitle;
+	}
+
+	@Override
+	public int compareTo(Race other) {
+		return this.raceTitle.compareTo(other.raceTitle);
 	}
 }
