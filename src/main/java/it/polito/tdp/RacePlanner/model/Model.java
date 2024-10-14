@@ -59,7 +59,7 @@ public class Model {
 		this.esperto = new Atleta("Esperto", categorieEsperto, giorniEsperto);
 	}
 	
-	// servono i controlli?
+	// servono i controlli? Se sì, gestire errore nel controller
 	public List<String> getMesi() {
 		if(this.mapMonths!=null && !this.mapMonths.keySet().isEmpty()) {
 			List<String> mesi = new ArrayList<>(this.mapMonths.values());
@@ -122,7 +122,7 @@ public class Model {
 		return null;
 	}
 
-	public List<Race> getRacesByFilters(String lvl, String favCat, Integer anno, List<String> continenti,
+	/*public List<Race> getRacesByFilters(String lvl, String favCat, Integer anno, List<String> continenti,
 			List<String> nazioni, List<String> mesiNo) {
 		List<String> categorie = this.getAtleta(lvl).getCategorieValide();
 		List<Race> gare = dao.getRacesByFilters(anno, favCat, categorie, continenti, nazioni);
@@ -135,12 +135,56 @@ public class Model {
 				}
 			}
 			Collections.sort(gareFiltered);
-			System.out.println(gareFiltered.size());
 			return gareFiltered;
 		}
 		
 		Collections.sort(gare);
-		System.out.println(gare.size());
+		return gare;
+	}*/
+	
+	// ottengo la lista di gare valide
+	public List<Race> getRaces(String lvl, Integer anno, List<String> continenti, List<String> nazioni) {
+		List<String> categorie = this.getAtleta(lvl).getCategorieValide();
+		return dao.getRaces(anno, categorie, continenti, nazioni);
+		// ritorno una lista non ordinata, devo ordinarla?
+	}
+	
+	// applico i filtri di "Categoria preferita" e "Mesi da escludere" sulla lista di gare valide
+	public List<Race> getFilteredRaces(String lvl, String favCat, Integer anno, List<String> continenti,
+			List<String> nazioni, List<String> mesiNo) {
+		List<Race> gare = this.getRaces(lvl, anno, continenti, nazioni);
+	
+		if(gare!=null && !gare.isEmpty()) {
+			if(favCat!=null || (mesiNo!=null && !mesiNo.isEmpty())) {
+				List<Race> gareFiltered = new ArrayList<>();
+				if(favCat!=null) {
+					//filtro solo gare di categoria favCat
+					for(Race gara : gare) {
+						if(gara.getRaceCategory().equals(favCat)) {
+							gareFiltered.add(gara);
+						}
+					}
+				}
+				
+				//filtro sui mesi esclusi
+				if(mesiNo!=null && !mesiNo.isEmpty()) {
+					for(Race gara : gare) {
+						if(!mesiNo.contains(this.mapMonths.get(gara.getDate().getMonth())) 
+								&& !gareFiltered.contains(gara)) {
+							gareFiltered.add(gara);
+						}
+					}
+				}
+				
+				Collections.sort(gareFiltered);
+				return gareFiltered;
+			}
+			
+		} else {
+			return null;
+		}
+		
+		Collections.sort(gare);
 		return gare;
 	}
 

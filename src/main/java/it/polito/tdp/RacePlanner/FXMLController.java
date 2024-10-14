@@ -189,7 +189,38 @@ public class FXMLController {
     @FXML
     void doMaximizeKm(ActionEvent event) {
     	txtResult.clear();
-    	if(cmbLevel.getValue()!=null && cmbYear.getValue()!=null) {
+    	String lvl = cmbLevel.getValue();
+    	Integer anno = cmbYear.getValue();
+    	
+    	if(lvl!=null && anno!=null) {
+    		String favCat = cmbCategory.getValue();
+    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
+        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
+        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+        	Race favRace = cmbFavRace.getValue();
+        	
+        	int maxGare;
+        	try {
+        		maxGare = Integer.parseInt(txtNMaxRaces.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Numero massimo di gare\" non valido");
+        		return;
+        	}
+        	
+        	double maxKm;
+        	try {
+        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido");
+        		return;
+        	}
+        	
+    		List<Race> racePlan = model.massimizza(lvl, favCat, anno, continenti, nazioni, mesiNo, favRace, maxGare, maxKm);
+    		if(racePlan!=null && !racePlan.isEmpty()) {
+    			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    		} else {
+    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); //DA MODIFICARE
+    		}
     		
     	} else {
     		lblWarnings.setText("Attenzione: seleziona almeno il livello di abilità e l'anno per proseguire");
@@ -199,7 +230,38 @@ public class FXMLController {
     @FXML
     void doMaximizeNations(ActionEvent event) {
     	txtResult.clear();
-    	if(cmbLevel.getValue()!=null && cmbYear.getValue()!=null) {
+    	String lvl = cmbLevel.getValue();
+    	Integer anno = cmbYear.getValue();
+    	
+    	if(lvl!=null && anno!=null) {
+    		String favCat = cmbCategory.getValue();
+    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
+        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
+        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+        	Race favRace = cmbFavRace.getValue();
+        	
+        	int maxGare;
+        	try {
+        		maxGare = Integer.parseInt(txtNMaxRaces.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Numero massimo di gare\" non valido");
+        		return;
+        	}
+        	
+        	double maxKm;
+        	try {
+        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+        	} catch(NumberFormatException e) {
+        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido");
+        		return;
+        	}
+        	
+    		List<Race> racePlan = model.massimizza(lvl, favCat, anno, continenti, nazioni, mesiNo, favRace, maxGare, maxKm);
+    		if(racePlan!=null && !racePlan.isEmpty()) {
+    			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    		} else {
+    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); //DA MODIFICARE
+    		}
     		
     	} else {
     		lblWarnings.setText("Attenzione: seleziona almeno il livello di abilità e l'anno per proseguire");
@@ -344,8 +406,9 @@ public class FXMLController {
     			&& !nazioni.contains("null") && !mesiNo.contains("null")) {
     		cmbFavRace.setDisable(false);
     		String favCat = cmbCategory.getValue();
-    		List<Race> racesFiltered = model.getRacesByFilters(lvl, favCat, anno, continenti, nazioni, mesiNo);
-    		cmbFavRace.getItems().addAll(racesFiltered);
+    		model.getRaces(lvl, anno, continenti, nazioni);
+    		List<Race> filteredRaces = model.getFilteredRaces(lvl, favCat, anno, continenti, nazioni, mesiNo);
+    		cmbFavRace.getItems().addAll(filteredRaces);
     		
     	} else {
     		cmbFavRace.setDisable(true);
