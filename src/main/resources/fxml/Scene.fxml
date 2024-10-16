@@ -141,15 +141,15 @@
                                           </Label>
                                           <HBox alignment="CENTER" spacing="20.0">
                                              <children>
-                                                <Button mnemonicParsing="false" onAction="#doMaximizeRaces" prefHeight="30.0" prefWidth="65.0" text="Gare">
+                                                <Button fx:id="btnGare" mnemonicParsing="false" onAction="#doMaximizeRaces" prefHeight="30.0" prefWidth="65.0" text="Gare">
                                                    <font>
                                                       <Font name="Arial" size="14.0" />
                                                    </font></Button>
-                                                <Button mnemonicParsing="false" onAction="#doMaximizeKm" prefHeight="30.0" prefWidth="65.0" text="Km">
+                                                <Button fx:id="btnKm" mnemonicParsing="false" onAction="#doMaximizeKm" prefHeight="30.0" prefWidth="65.0" text="Km">
                                                    <font>
                                                       <Font name="Arial" size="14.0" />
                                                    </font></Button>
-                                                <Button mnemonicParsing="false" onAction="#doMaximizeNations" prefHeight="30.0" text="Nazioni">
+                                                <Button fx:id="btnNazioni" mnemonicParsing="false" onAction="#doMaximizeNations" prefHeight="30.0" text="Nazioni">
                                                    <font>
                                                       <Font name="Arial" size="14.0" />
                                                    </font></Button>

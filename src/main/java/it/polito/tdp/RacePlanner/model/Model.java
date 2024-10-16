@@ -2,9 +2,11 @@ package it.polito.tdp.RacePlanner.model;
 
 import java.time.Month;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +23,12 @@ public class Model {
 	private Atleta principiante;
 	private Atleta intermedio;
 	private Atleta esperto;
+	
+	private List<Race> gareValide;
+	
+	private List<Race> best;
+	private double kmCount;
+	private int nazioniCount;
 	
 	public Model() {
 		this.dao = new RacePlannerDAO();
@@ -44,9 +52,9 @@ public class Model {
 		// creo atleta intermedio
 		List<String> categorieIntermedio = Arrays.asList("20K","50K","100K"); //lista fissa non modificabile
 		Map<String, Integer> giorniIntermedio = new HashMap<>();
-		giorniPrincipiante.put("20K", 25);
-		giorniPrincipiante.put("50K", 40);
-		giorniPrincipiante.put("100K", 70);
+		giorniIntermedio.put("20K", 25);
+		giorniIntermedio.put("50K", 40);
+		giorniIntermedio.put("100K", 70);
 		this.intermedio = new Atleta("Intermedio", categorieIntermedio, giorniIntermedio);
 		
 		// creo atleta esperto
@@ -59,7 +67,7 @@ public class Model {
 		this.esperto = new Atleta("Esperto", categorieEsperto, giorniEsperto);
 	}
 	
-	// servono i controlli? Se sì, gestire errore nel controller
+	// TODO servono i controlli? Se sì, gestire errore nel controller
 	public List<String> getMesi() {
 		if(this.mapMonths!=null && !this.mapMonths.keySet().isEmpty()) {
 			List<String> mesi = new ArrayList<>(this.mapMonths.values());
@@ -145,30 +153,28 @@ public class Model {
 	// ottengo la lista di gare valide
 	public List<Race> getRaces(String lvl, Integer anno, List<String> continenti, List<String> nazioni) {
 		List<String> categorie = this.getAtleta(lvl).getCategorieValide();
-		return dao.getRaces(anno, categorie, continenti, nazioni);
-		// ritorno una lista non ordinata, devo ordinarla?
+		this.gareValide = new ArrayList<>(dao.getRaces(anno, categorie, continenti, nazioni));
+		return this.gareValide;
+		// TODO ritorno una lista non ordinata, devo ordinarla?
 	}
 	
 	// applico i filtri di "Categoria preferita" e "Mesi da escludere" sulla lista di gare valide
-	public List<Race> getFilteredRaces(String lvl, String favCat, Integer anno, List<String> continenti,
-			List<String> nazioni, List<String> mesiNo) {
-		List<Race> gare = this.getRaces(lvl, anno, continenti, nazioni);
-	
-		if(gare!=null && !gare.isEmpty()) {
+	public List<Race> getFilteredRaces(String favCat, List<String> mesiNo) {
+		if(this.gareValide!=null && !this.gareValide.isEmpty()) {
 			if(favCat!=null || (mesiNo!=null && !mesiNo.isEmpty())) {
 				List<Race> gareFiltered = new ArrayList<>();
 				if(favCat!=null) {
-					//filtro solo gare di categoria favCat
-					for(Race gara : gare) {
+					// filtro solo gare di categoria favCat
+					for(Race gara : this.gareValide) {
 						if(gara.getRaceCategory().equals(favCat)) {
 							gareFiltered.add(gara);
 						}
 					}
 				}
 				
-				//filtro sui mesi esclusi
 				if(mesiNo!=null && !mesiNo.isEmpty()) {
-					for(Race gara : gare) {
+					// filtro sui mesi esclusi
+					for(Race gara : this.gareValide) {
 						if(!mesiNo.contains(this.mapMonths.get(gara.getDate().getMonth())) 
 								&& !gareFiltered.contains(gara)) {
 							gareFiltered.add(gara);
@@ -176,22 +182,136 @@ public class Model {
 					}
 				}
 				
-				Collections.sort(gareFiltered);
-				return gareFiltered;
+				if(!gareFiltered.isEmpty())
+					return gareFiltered;
+				else 
+					return null;
 			}
 			
 		} else {
 			return null;
 		}
+
+		return this.gareValide;
+	}
+	
+	// TODO controllare se servono tutti i parametri, cancellare quelli inutili
+	public List<Race> massimizza(String button, String lvl, String favCat, Integer anno, List<String> continenti, 
+			List<String> nazioni, List<String> mesiNo, Race favRace, Integer maxGare, Double maxKm) {
+		if(this.gareValide==null || this.gareValide.isEmpty()) {
+			return null;
+		}
 		
-		Collections.sort(gare);
-		return gare;
+//		Collections.sort(this.gareValide, new Comparator<Race>() {
+//			@Override
+//			public int compare(Race r1, Race r2) {
+//				return r1.getDate().compareTo(r2.getDate());
+//			}	
+//		});
+		
+		this.best = new ArrayList<>();
+		this.kmCount = 0;
+		this.nazioniCount = 0;
+		List<Race> parziale = new ArrayList<>();
+		if(favRace!=null) {
+			parziale.add(favRace);
+		}
+		
+		switch(button) {
+		case "Gare":
+			//chiamo metodo massimizzaGare
+			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm);
+			break;
+		case "Km":
+			//chiamo metodo massimizzaKm
+			
+			break;
+		case "Nazioni":
+			//chiamo metodo massimizzaNazioni
+			
+			break;
+		}
+		
+		Collections.sort(this.best, new Comparator<Race>() {
+			@Override
+			public int compare(Race r1, Race r2) {
+				return r1.getDate().compareTo(r2.getDate());
+			}	
+		});
+		return this.best;
 	}
 
-	public List<Race> massimizza(String lvl, String favCat, Integer anno, List<String> continenti, 
-			List<String> nazioni, List<String> mesiNo, Race favRace, int maxGare, double maxKm) {
-		// TODO Auto-generated method stub
-		return null;
+	private void massimizzaGare(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm) {
+		// TODO controlli di terminazione
+		if(maxGare!=null && parziale.size() > maxGare) {
+			return;
+		}
+		
+		if(parziale.size() > best.size()) {
+			this.best = new ArrayList<>(parziale);
+		}
+	
+		for(Race gara : this.gareValide) {
+			if(!parziale.contains(gara) && aggiuntaValida(lvl, parziale, gara, favCat, maxKm)) {		
+				parziale.add(gara);
+				massimizzaGare(lvl, parziale, favCat, maxGare, maxKm);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+	}
+
+	private boolean aggiuntaValida(String lvl, List<Race> parziale, Race gara, String favCat, Double maxKm) {		
+		if(maxKm!=null && gara.getDistance() > maxKm)
+			return false;
+		
+		List<Race> listaGare = new ArrayList<>(parziale);
+		listaGare.add(gara);
+		
+		int countFavCat = 0;
+		int countIntermedio = 0;
+		int countEsperto = 0;
+		
+		for(Race r : listaGare) {
+			if(favCat!=null && r.getRaceCategory().equals(favCat))
+				countFavCat++;
+			if(lvl.equals("Intermedio") && r.getRaceCategory().equals("100K"))
+				countIntermedio++;
+			if(lvl.equals("Esperto") && r.getRaceCategory().equals("100M"))
+				countEsperto++;
+		}
+		
+		if(favCat!=null && countFavCat < (listaGare.size()+1)/2) 
+			return false;
+		
+		if(lvl.equals("Intermedio") && countIntermedio>4)
+			return false;
+		
+		if(lvl.equals("Esperto") && countEsperto>4)
+			return false;
+		
+		Collections.sort(listaGare, new Comparator<Race>() {
+			@Override
+			public int compare(Race r1, Race r2) {
+				return r1.getDate().compareTo(r2.getDate());
+			}	
+		});
+		Atleta atleta = this.getAtleta(lvl);
+		for(int i=0; i<listaGare.size()-1; i++) {
+			int giorniMin = atleta.getMapCategoriaGiorni().get(listaGare.get(i).getRaceCategory());
+			long giorniTraGare = ChronoUnit.DAYS.between(listaGare.get(i).getDate(), listaGare.get(i+1).getDate());
+			if(giorniTraGare < giorniMin)
+				return false;
+		}
+		
+//		if(!parziale.isEmpty()) {
+//			Atleta atleta = this.getAtleta(lvl);
+//			int giorniMin = atleta.getMapCategoriaGiorni().get(parziale.get(parziale.size()-1).getRaceCategory());
+//			long giorniTraGare = ChronoUnit.DAYS.between(parziale.get(parziale.size()-1).getDate(), gara.getDate());
+//			if(giorniTraGare < giorniMin)
+//				return false;
+//		}
+		
+		return true;
 	}
 
 }
