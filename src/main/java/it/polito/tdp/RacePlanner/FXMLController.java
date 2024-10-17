@@ -199,6 +199,7 @@ public class FXMLController {
     @FXML
     void doMaximizeKm(ActionEvent event) {
     	txtResult.clear();
+    	tblRaces.getItems().clear();
     	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
@@ -235,8 +236,11 @@ public class FXMLController {
     		List<Race> racePlan = model.massimizza("Km", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
+    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
     		} else {
-    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); // TODO DA MODIFICARE, disabilitare i button(?)
+    			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
     		
     	} else {
@@ -248,6 +252,7 @@ public class FXMLController {
     @FXML
     void doMaximizeNations(ActionEvent event) {
     	txtResult.clear();
+    	tblRaces.getItems().clear();
     	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
@@ -284,8 +289,11 @@ public class FXMLController {
     		List<Race> racePlan = model.massimizza("Nazioni", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
+    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
     		} else {
-    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); // TODO DA MODIFICARE, disabilitare i button(?)
+    			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
     		
     	} else {
@@ -297,6 +305,7 @@ public class FXMLController {
     @FXML
     void doMaximizeRaces(ActionEvent event) {
     	txtResult.clear();
+    	tblRaces.getItems().clear();
     	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
@@ -334,8 +343,11 @@ public class FXMLController {
     		List<Race> racePlan = model.massimizza("Gare", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
+    			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
+    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
     		} else {
-    			lblWarnings.setText("ERRORE NELLA RICORSIONE"); // TODO DA MODIFICARE, disabilitare i button(?)
+    			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
     		
     	} else {
@@ -524,6 +536,8 @@ public class FXMLController {
         assert txtTimeR4 != null : "fx:id=\"txtTimeR4\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtTimeR5 != null : "fx:id=\"txtTimeR5\" was not injected: check your FXML file 'Scene.fxml'.";
         
+        txtResult.setStyle("-fx-font-family: monospace");
+        
         colDate.setCellValueFactory(new PropertyValueFactory<Race, LocalDate>("date"));
         // TODO forse gambiando getDate in Race mi cambia la visualizzazione, PROVARE
         colPlace.setCellValueFactory(new PropertyValueFactory<Race, String>("rawLocation"));
@@ -544,11 +558,6 @@ public class FXMLController {
         cmbCatR3.getItems().addAll(categorie);
         cmbCatR4.getItems().addAll(categorie);
         cmbCatR5.getItems().addAll(categorie);
-        
-//        List<String> mesi = new ArrayList<>();
-//        mesi.addAll(Arrays.asList("Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",
-//        		"Settembre", "Ottobre", "Novembre", "Dicembre"));
-//        ckCmbMonths.getItems().addAll(mesi);
         
         // monitora le modifiche negli elementi selezionati dell'oggetto ckCmbContinents
         ckCmbContinents.getCheckModel().getCheckedItems().addListener(new ListChangeListener<String>() {

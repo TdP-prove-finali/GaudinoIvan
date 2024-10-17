@@ -187,12 +187,12 @@
                                                 <TableColumn fx:id="colElevGain" maxWidth="65.0" prefWidth="65.0" text="Dislivello" />
                                             </columns>
                                           </TableView>
-                                          <TextArea fx:id="txtResult" editable="false" maxWidth="350.0" prefHeight="150.0">
+                                          <TextArea fx:id="txtResult" editable="false" maxWidth="350.0" prefHeight="150.0" wrapText="true">
                                              <VBox.margin>
                                                 <Insets bottom="20.0" top="25.0" />
                                              </VBox.margin>
                                              <font>
-                                                <Font size="13.0" />
+                                                <Font size="15.0" />
                                              </font>
                                           </TextArea>
                                        </children>

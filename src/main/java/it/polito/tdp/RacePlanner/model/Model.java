@@ -8,11 +8,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeSet;
+import java.util.Set;
 
 import it.polito.tdp.RacePlanner.db.RacePlannerDAO;
 
@@ -124,8 +125,6 @@ public class Model {
 			this.gareValide = gareValideFiltered;
 		}
 		System.out.println(this.gareValide.size()); // TODO DA TOGLIERE
-		//return this.gareValide;
-		// TODO ritorno una lista non ordinata, devo ordinarla?
 	}
 	
 	// applico il filtro di "Categoria preferita" sulla lista di gare valide
@@ -153,21 +152,7 @@ public class Model {
 		return this.gareValide;
 	}
 	
-	// TODO controllare se servono tutti i parametri, cancellare quelli inutili
 	public List<Race> massimizza(String button, String lvl, String favCat, Race favRace, Integer maxGare, Double maxKm) {
-//		if(this.gareValide==null || this.gareValide.isEmpty()) {
-//			return null;
-//		}
-		
-		/*Comparator<Race> ordinaPerData = new Comparator<Race>() {
-			@Override
-			public int compare(Race r1, Race r2) {
-				return r1.getDate().compareTo(r2.getDate());
-			}
-		};
-		
-		Collections.sort(this.gareValide, ordinaPerData);*/
-		
 		Collections.sort(this.gareValide, new Comparator<Race>() {
 			@Override
 			public int compare(Race r1, Race r2) {
@@ -178,37 +163,29 @@ public class Model {
 		this.best = new ArrayList<>();
 		this.kmCount = 0;
 		this.nazioniCount = 0;
-		//TreeSet<Race> parziale = new TreeSet<>(ordinaPerData);
 		List<Race> parziale = new ArrayList<>();
 		
 		int cntFavCat = 0;
-		int cntFavCatBest = 0;
 		int cnt100K = 0;
 		int cnt100M = 0;
+		double cntKm = 0;
+		//List<String> mapNazioni = new ArrayList<>();
+		Map<String, Integer> mapNazioni = new HashMap<>();
+		Set<String> setNazioni = new HashSet<>();
 		
 		switch(button) {
 		case "Gare":
-			//chiamo metodo massimizzaGare
-			// TODO potrei passare atleta anziché lvl
-			//massimizzaGare(0, lvl, parziale, favCat, maxGare, maxKm);
-			massimizzaGare2(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cntFavCatBest, cnt100K, cnt100M);
+			// TODO implementare filtro favCat (o eliminarlo)
+			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
 			break;
 		case "Km":
-			//chiamo metodo massimizzaKm
-			
+			massimizzaKm(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, cntKm);
 			break;
 		case "Nazioni":
-			//chiamo metodo massimizzaNazioni
-			
+			massimizzaNazioni(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, mapNazioni, setNazioni);
 			break;
 		}
 		
-//		Collections.sort(this.best, new Comparator<Race>() {
-//			@Override
-//			public int compare(Race r1, Race r2) {
-//				return r1.getDate().compareTo(r2.getDate());
-//			}	
-//		});
 		if(favRace!=null) {
 			parziale.add(favRace);
 			int index = 0;
@@ -241,23 +218,22 @@ public class Model {
 				
 			}
 		}
-		
+	
 		return this.best;
 	}
-	
-	private void massimizzaGare2(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
-			int cntFavCat, int cntFavCatBest, int cnt100K, int cnt100M) {
+
+	private void massimizzaGare(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
+			int cntFavCat, int cnt100K, int cnt100M) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
 		
 		if(parziale.size() > best.size()) {
-			if(favCat!=null) {
-				if(cntFavCat > cntFavCatBest || parziale.size()==1)
-					cntFavCatBest = cntFavCat;
-				else
+			/*if(favCat!=null) {
+				int minGareFavCat = (parziale.size()+1)/2;
+				if(cntFavCat < minGareFavCat)
 					return;
-			}
+			}*/
 			this.best = new ArrayList<>(parziale);
 		}
 	
@@ -290,7 +266,7 @@ public class Model {
 				cnt100M++;
 			}
 			parziale.add(gara);
-			massimizzaGare2(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cntFavCatBest, cnt100K, cnt100M);
+			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
 			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
 				cntFavCat--;
 			}
@@ -304,137 +280,170 @@ public class Model {
 		}
 	}
 	
-	private boolean vincoloGiorni(String lvl, List<Race> parziale, Race gara) {
-		/*if(!parziale.isEmpty()) {
-			Atleta atleta = this.getAtleta(lvl);
-			int giorniMin = atleta.getMapCategoriaGiorni().get(gara.getRaceCategory());
-			Race prec = parziale.lower(gara);
-			Race succ = parziale.higher(gara);
-			if (prec!=null) {
-		        long giorniTraGare = ChronoUnit.DAYS.between(prec.getDate(), gara.getDate());
-		        if (giorniTraGare < giorniMin) {
-		            return false;
-		        }
-		    }
-			if (succ!=null) {
-		        long giorniTraGare = ChronoUnit.DAYS.between(gara.getDate(), succ.getDate());
-		        if (giorniTraGare < giorniMin) {
-		            return false; // Non soddisfa il vincolo
-		        }
-		    }
-		}
-		
-		return true;*/
-		
-//		List<Race> listaGare = new ArrayList<>(parziale);
-//		listaGare.add(gara);
-		
-		/*Collections.sort(listaGare, new Comparator<Race>() {
-			@Override
-			public int compare(Race r1, Race r2) {
-				return r1.getDate().compareTo(r2.getDate());
-			}	
-		});
-		Atleta atleta = this.getAtleta(lvl);
-		for(int i=0; i<listaGare.size()-1; i++) {
-			Race r1 = listaGare.get(i);
-			Race r2 = listaGare.get(i+1);
-			int giorniMin = atleta.getMapCategoriaGiorni().get(r1.getRaceCategory());
-			long giorniTraGare = ChronoUnit.DAYS.between(r1.getDate(), r2.getDate());
-			if(giorniTraGare < giorniMin)
-				return false;
-		}*/
-		
-		// se ordino gareValide per data prima di lanciare la ricorsione
-		// ma così facendo avrei problemi con FavRace
-		if(!parziale.isEmpty()) {
-			//List<Race> listaGare = new ArrayList<>(parziale);
-			Atleta atleta = this.getAtleta(lvl);
-			int giorniMin = atleta.getMapCategoriaGiorni().get(parziale.get(parziale.size()-1).getRaceCategory());
-			long giorniTraGare = ChronoUnit.DAYS.between(parziale.get(parziale.size()-1).getDate(), gara.getDate());
-			if(giorniTraGare < giorniMin)
-				return false;
-		}
-		
-		return true;
-	}
-	
-	private void massimizzaGare(int L, String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm) {
+	private void massimizzaKm(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
+			int cntFavCat, int cnt100K, int cnt100M, double cntKm) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
 		
-		if(parziale.size() > best.size()) {
+		if(cntKm > this.kmCount) {
 			this.best = new ArrayList<>(parziale);
+			this.kmCount = cntKm;
 		}
-		
-		if(L == this.gareValide.size())
+	
+		for(Race gara : this.gareValide) {
+			if(parziale.contains(gara)) 
+				continue;
+				
+			if(maxKm!=null && gara.getDistance() > maxKm)
+				continue;
+			
+//			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
+//				continue;
+			
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
+				continue;
+			
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && cnt100M >= 4)
+				continue;
+			
+			if(!vincoloGiorni(lvl, parziale, gara))
+				continue;
+			
+			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+				cntFavCat++;
+			}
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+				cnt100K++;
+			}
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+				cnt100M++;
+			}
+			cntKm += gara.getDistance();
+			parziale.add(gara);
+			massimizzaKm(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, cntKm);
+			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+				cntFavCat--;
+			}
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+				cnt100K--;
+			}
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+				cnt100M--;
+			}
+			cntKm -= gara.getDistance();
+			parziale.remove(parziale.size()-1);
+		}
+	}
+	
+	private void massimizzaNazioni(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
+			int cntFavCat, int cnt100K, int cnt100M, Map<String, Integer> mapNazioni, Set<String> setNazioni) {
+		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
-		
-		if(aggiuntaValida(lvl, parziale, this.gareValide.get(L), favCat, maxKm)) {
-			parziale.add(this.gareValide.get(L));
-			massimizzaGare(L+1, lvl, parziale, favCat, maxGare, maxKm);
-			parziale.remove(this.gareValide.get(L));
-			massimizzaGare(L+1, lvl, parziale, favCat, maxGare, maxKm);
 		}
 		
-		massimizzaGare(L+1, lvl, parziale, favCat, maxGare, maxKm);
+		//setNazioni = new HashSet<>(mapNazioni);
+		setNazioni = mapNazioni.keySet();
+		int cntNazioni = setNazioni.size();
+		if(cntNazioni > this.nazioniCount) {
+			this.best = new ArrayList<>(parziale);
+			this.nazioniCount = cntNazioni;
+		}
+	
+		for(Race gara : this.gareValide) {
+			if(parziale.contains(gara)) 
+				continue;
+				
+			if(maxKm!=null && gara.getDistance() > maxKm)
+				continue;
+			
+//			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
+//				continue;
+			
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
+				continue;
+			
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && cnt100M >= 4)
+				continue;
+			
+			if(!vincoloGiorni(lvl, parziale, gara))
+				continue;
+			
+			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+				cntFavCat++;
+			}
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+				cnt100K++;
+			}
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+				cnt100M++;
+			}
+			
+			//mapNazioni.add(gara.getCountry());
+			
+			String country = gara.getCountry();
+			mapNazioni.put(country, mapNazioni.getOrDefault(country, 0) + 1);
+			
+			parziale.add(gara);
+			massimizzaNazioni(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, mapNazioni, setNazioni);
+			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+				cntFavCat--;
+			}
+			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+				cnt100K--;
+			}
+			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+				cnt100M--;
+			}
+			
+			//mapNazioni.remove(parziale.get(parziale.size()-1).getCountry());	
+			
+			if(mapNazioni.get(country) == 1) {
+				mapNazioni.remove(country);
+			} else {
+				mapNazioni.put(country, mapNazioni.get(country) - 1);
+			}
+			parziale.remove(parziale.size()-1);
+		}		
 	}
 
-	private boolean aggiuntaValida(String lvl, List<Race> parziale, Race gara, String favCat, Double maxKm) {		
-		if(maxKm!=null && gara.getDistance() > maxKm)
-			return false;
-		
-		List<Race> listaGare = new ArrayList<>(parziale);
-		listaGare.add(gara);
-		
-		int countFavCat = 0;
-		int countIntermedio = 0;
-		int countEsperto = 0;
-		
-		for(Race r : listaGare) {
-			if(favCat!=null && r.getRaceCategory().equals(favCat))
-				countFavCat++;
-			if(lvl.equals("Intermedio") && r.getRaceCategory().equals("100K"))
-				countIntermedio++;
-			if(lvl.equals("Esperto") && r.getRaceCategory().equals("100M"))
-				countEsperto++;
-		}
-		
-		if(favCat!=null && countFavCat < (listaGare.size()+1)/2) 
-			return false;
-		
-		if(lvl.equals("Intermedio") && countIntermedio>4)
-			return false;
-		
-		if(lvl.equals("Esperto") && countEsperto>4)
-			return false;
-		
-		Collections.sort(listaGare, new Comparator<Race>() {
-			@Override
-			public int compare(Race r1, Race r2) {
-				return r1.getDate().compareTo(r2.getDate());
-			}	
-		});
-		Atleta atleta = this.getAtleta(lvl);
-		for(int i=0; i<listaGare.size()-1; i++) {
-			int giorniMin = atleta.getMapCategoriaGiorni().get(listaGare.get(i).getRaceCategory());
-			long giorniTraGare = ChronoUnit.DAYS.between(listaGare.get(i).getDate(), listaGare.get(i+1).getDate());
-			if(giorniTraGare < giorniMin)
-				return false;
-		}
-		
-		// se ordino gareValide per data prima di lanciare la ricorsione
-		// ma così facendo avrei problemi con FavRace
-		/*if(!parziale.isEmpty()) {
+	private boolean vincoloGiorni(String lvl, List<Race> parziale, Race gara) {
+		if(!parziale.isEmpty()) {
 			Atleta atleta = this.getAtleta(lvl);
 			int giorniMin = atleta.getMapCategoriaGiorni().get(parziale.get(parziale.size()-1).getRaceCategory());
 			long giorniTraGare = ChronoUnit.DAYS.between(parziale.get(parziale.size()-1).getDate(), gara.getDate());
 			if(giorniTraGare < giorniMin)
 				return false;
-		}*/
-		
+		}
 		return true;
 	}
-
+	
+	public Double getKmTot() {
+		if(this.best==null || this.best.isEmpty())
+			return null;
+		
+		if(this.kmCount!=0)
+			return Math.round(kmCount*100.0)/100.0;
+		
+		double kmTot = 0;
+		for(Race r : this.best) {
+			kmTot += r.getDistance();
+		}
+		return kmTot;
+	}
+	
+	public Integer getNazioniSoluzione() {
+		if(this.best==null || this.best.isEmpty())
+			return null;
+		
+		if(this.nazioniCount!=0)
+			return this.nazioniCount;
+		
+		Set<String> nazioni = new HashSet<>();
+		for(Race r : this.best) {
+			nazioni.add(r.getCountry());
+		}
+		return nazioni.size();
+	}
+	
 }
