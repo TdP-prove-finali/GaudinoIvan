@@ -60,30 +60,6 @@ public class RacePlannerDAO {
 		return result;
 	}
 	
-	/*public void getContinentsMap(Map<String, String> mapContinents) {
-		String sql = "SELECT DISTINCT c.* "
-				+ "FROM races r, continents c "
-				+ "WHERE r.Continent = c.Code";
-		
-		try {
-			Connection conn = DBConnect.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-			ResultSet res = st.executeQuery();
-			
-			while(res.next()) {
-				if(!mapContinents.containsKey(res.getString("Code"))) {
-					mapContinents.put(res.getString("Code"), res.getString("Name"));
-				}
-			}
-			
-			conn.close();
-			
-		} catch(SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException("SQL Error");
-		}
-	}*/
-	
 	public List<String> getCountries() {
 		String sql = "SELECT DISTINCT c.Name AS Country "
 				+ "FROM races r, countries c "
@@ -141,19 +117,6 @@ public class RacePlannerDAO {
 		StringBuilder sql = new StringBuilder("SELECT r.* FROM races r, continents c, countries n "
 				+ "WHERE r.Continent=c.Code AND r.Country=n.Code AND r.Year=? ");
 		
-//		if(favCat!=null) {
-//			//filtro solo gare di categoria favCat
-//			sql.append("AND r.RaceCategory=? ");
-//		} else {
-//			//filtro le gare sulla base delle categorie compatibili con livello abilità
-//			sql.append("AND r.RaceCategory IN (");
-//			for(int i=0; i<categorie.size(); i++) {
-//				sql.append("?,");
-//			}
-//			sql.deleteCharAt(sql.length() - 1);
-//			sql.append(") ");
-//		}
-		
 		if(categorie!=null && !categorie.isEmpty()) {
 			sql.append("AND r.RaceCategory IN (");
 			for(int i=0; i<categorie.size(); i++) {
@@ -188,14 +151,6 @@ public class RacePlannerDAO {
 			PreparedStatement st = conn.prepareStatement(sql.toString());
 			int index = 1;
 			st.setInt(index++, anno);
-			
-//			if(favCat!=null) {
-//				st.setString(index++, favCat);
-//			} else {
-//				for(String cat : categorie) {
-//					st.setString(index++, cat);
-//				}
-//			}
 			
 			if(categorie!=null && !categorie.isEmpty()) {
 				for(String cat : categorie) {

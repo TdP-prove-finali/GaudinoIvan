@@ -30,6 +30,7 @@ import it.polito.tdp.RacePlanner.model.Race;
 public class FXMLController {
 	
 	private Model model;
+	private boolean isFavRaceEmpty;
 
     @FXML
     private ResourceBundle resources;
@@ -198,14 +199,17 @@ public class FXMLController {
     @FXML
     void doMaximizeKm(ActionEvent event) {
     	txtResult.clear();
+    	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
     	
     	if(lvl!=null && anno!=null) {
-    		String favCat = cmbCategory.getValue();
-    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
-        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
-        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+    		String favCat;
+    		if(this.isFavRaceEmpty)
+    			favCat = null;
+    		else
+    			favCat = cmbCategory.getValue();
+    		
         	Race favRace = cmbFavRace.getValue();
         	
         	Integer maxGare = null;
@@ -228,8 +232,7 @@ public class FXMLController {
 	        	}
         	}
         	
-    		List<Race> racePlan = model.massimizza("Km", lvl, favCat, anno, continenti, nazioni, 
-    				mesiNo, favRace, maxGare, maxKm);
+    		List<Race> racePlan = model.massimizza("Km", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     		} else {
@@ -245,14 +248,17 @@ public class FXMLController {
     @FXML
     void doMaximizeNations(ActionEvent event) {
     	txtResult.clear();
+    	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
     	
     	if(lvl!=null && anno!=null) {
-    		String favCat = cmbCategory.getValue();
-    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
-        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
-        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+    		String favCat;
+    		if(this.isFavRaceEmpty)
+    			favCat = null;
+    		else
+    			favCat = cmbCategory.getValue();
+    		
         	Race favRace = cmbFavRace.getValue();
         	
         	Integer maxGare = null;
@@ -275,8 +281,7 @@ public class FXMLController {
 	        	}
         	}
         	
-    		List<Race> racePlan = model.massimizza("Nazioni", lvl, favCat, anno, continenti, nazioni, 
-    				mesiNo, favRace, maxGare, maxKm);
+    		List<Race> racePlan = model.massimizza("Nazioni", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     		} else {
@@ -292,14 +297,18 @@ public class FXMLController {
     @FXML
     void doMaximizeRaces(ActionEvent event) {
     	txtResult.clear();
+    	lblWarnings.setText("");
     	String lvl = cmbLevel.getValue();
     	Integer anno = cmbYear.getValue();
     	
     	if(lvl!=null && anno!=null) {
-    		String favCat = cmbCategory.getValue();
-    		List<String> continenti = ckCmbContinents.getCheckModel().getCheckedItems();
-        	List<String> nazioni = ckCmbNations.getCheckModel().getCheckedItems();
-        	List<String> mesiNo = ckCmbMonths.getCheckModel().getCheckedItems();
+    		String favCat;
+    		if(this.isFavRaceEmpty)
+    			favCat = null;
+    		else
+    			favCat = cmbCategory.getValue();
+    		
+    		
         	Race favRace = cmbFavRace.getValue();
         	
         	Integer maxGare = null;
@@ -322,8 +331,7 @@ public class FXMLController {
 	        	}
         	}
         	
-    		List<Race> racePlan = model.massimizza("Gare", lvl, favCat, anno, continenti, nazioni, 
-    				mesiNo, favRace, maxGare, maxKm);
+    		List<Race> racePlan = model.massimizza("Gare", lvl, favCat, favRace, maxGare, maxKm);
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     		} else {
@@ -400,23 +408,6 @@ public class FXMLController {
     void handleCmbLevel(ActionEvent event) {
     	String livello = cmbLevel.getValue();
     	if(livello!=null) {
-    		/*switch(livello) {
-        	case "Principiante":
-        		cmbCategory.getItems().clear();
-        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K"));
-        		break;
-        		
-        	case "Intermedio":
-        		cmbCategory.getItems().clear();
-        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K"));
-        		break;
-        		
-        	case "Esperto":
-        		cmbCategory.getItems().clear();
-        		cmbCategory.getItems().addAll(Arrays.asList("20K","50K","100K","100M"));
-        		break;
-        	}*/
-    		
     		cmbCategory.getItems().clear();
     		cmbCategory.getItems().addAll(model.getAtleta(livello).getCategorieValide());
     		this.handleCmbAction(event);
@@ -424,7 +415,6 @@ public class FXMLController {
     }
     
     // gestisco cmbFavRace in base ai valori selezionati
-    // TODO forse per cmbCategory non serve monitorare questo evento, CONTROLLARE
     @FXML
     void handleCmbAction(ActionEvent event) {
     	cmbFavRace.getItems().clear();
@@ -440,18 +430,21 @@ public class FXMLController {
     	// le condizioni sulle CheckComboBox risolvono un bug della libreria ControlsFX
     	if(lvl!=null && anno!=null && !continenti.contains("null") 
     			&& !nazioni.contains("null") && !mesiNo.contains("null")) {
-    		cmbFavRace.setDisable(false);
     		String favCat = cmbCategory.getValue();
-    		model.getRaces(lvl, anno, continenti, nazioni);
-    		List<Race> filteredRaces = model.getFilteredRaces(favCat, mesiNo);
-    		if(filteredRaces==null) {
+    		try {
+    			List<Race> filteredRaces = model.getFilteredRaces(lvl, favCat, anno, continenti, nazioni, mesiNo);
+    			cmbFavRace.setDisable(false);
+    			this.isFavRaceEmpty = false;
+    			Collections.sort(filteredRaces);
+    			cmbFavRace.getItems().addAll(filteredRaces);
+    		} catch(IllegalArgumentException e) {
     			btnGare.setDisable(true);
     			btnKm.setDisable(true);
     			btnNazioni.setDisable(true);
-    			lblWarnings.setText("Nessuna gara disponibile. Prova a selezionare altri valori.");
-    		} else {
-    			Collections.sort(filteredRaces);
-    			cmbFavRace.getItems().addAll(filteredRaces);
+    			lblWarnings.setText(e.getMessage());
+    		} catch(IllegalStateException e) {
+    			cmbFavRace.setDisable(true);
+    			this.isFavRaceEmpty = true;
     		}
     		
     	} else {
@@ -467,10 +460,7 @@ public class FXMLController {
     	// la condizione sulla CheckComboBox risolve un bug della libreria ControlsFX
     	if(!continentiSelezionati.isEmpty() && !continentiSelezionati.contains("null")) {
     		for(String continente : continentiSelezionati) {
-    			//ckCmbNations.getItems().addAll(model.getCountriesByContinent(continente));
     			nazioniDiContinente.addAll(model.getCountriesByContinent(continente));
-    			// TODO continente qui è il nome, ho modificato la query nel DAO (OK)
-    			// TODO conviene ordinare in ordine alfabetico, l'ho fatto qui (OK)
         	}
     		Collections.sort(nazioniDiContinente);
     		ckCmbNations.getItems().addAll(nazioniDiContinente);
