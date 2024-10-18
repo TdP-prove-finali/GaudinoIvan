@@ -17,15 +17,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import org.controlsfx.control.CheckComboBox;
 
@@ -171,6 +176,9 @@ public class FXMLController {
 
     @FXML
     private Tab tabMain;
+    
+    @FXML
+    private TabPane tabPane;
 
     @FXML
     private TableView<Race> tblRaces;
@@ -247,6 +255,14 @@ public class FXMLController {
     	}
     	lblLevel.setText("Il tuo livello di abilità è: "+this.livelloAbilita);
     }
+    
+    @FXML
+    void doSave(ActionEvent event) {
+    	if(this.livelloAbilita!=null) {
+    		cmbLevel.setValue(this.livelloAbilita);
+        	tabPane.getSelectionModel().select(tabMain);
+    	}
+    }
 
     @FXML
     void doMaximizeKm(ActionEvent event) {
@@ -289,8 +305,8 @@ public class FXMLController {
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
-    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -352,8 +368,8 @@ public class FXMLController {
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
-    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -416,8 +432,8 @@ public class FXMLController {
     		if(racePlan!=null && !racePlan.isEmpty()) {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
-    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -440,7 +456,17 @@ public class FXMLController {
 
     @FXML
     void doOpenGuide(ActionEvent event) {
-
+    	try {
+    		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/Guide.fxml"));
+    		Parent guide = (Parent) fxmlLoader.load();
+    		Stage stage = new Stage();
+    		stage.setTitle("Guida");
+    		stage.setScene(new Scene(guide));  
+    		stage.show();
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		System.out.println("Can't load new window");
+    	}
     }
 
     @FXML
@@ -484,18 +510,9 @@ public class FXMLController {
     	txtNMaxRaces.clear();
     	txtKmMaxRace.clear();
     	lblWarnings.setText("");
-//    	btnGare.setDisable(false);
-//		btnKm.setDisable(false);
-//		btnNazioni.setDisable(false);
     	// TODO resetto anche la table e txtResult?
     	tblRaces.getItems().clear();
     	txtResult.clear();
-    }
-
-    @FXML
-    void doSave(ActionEvent event) {
-    	// TODO devo switchare tab
-    	cmbLevel.setValue(this.livelloAbilita);
     }
     
     // gestisco l'azione di modifica selezione su cmbLevel
@@ -686,6 +703,7 @@ public class FXMLController {
         assert lblWarnings != null : "fx:id=\"lblWarnings\" was not injected: check your FXML file 'Scene.fxml'.";
         assert tabLevel != null : "fx:id=\"tabLevel\" was not injected: check your FXML file 'Scene.fxml'.";
         assert tabMain != null : "fx:id=\"tabMain\" was not injected: check your FXML file 'Scene.fxml'.";
+        assert tabPane != null : "fx:id=\"tabPane\" was not injected: check your FXML file 'Scene.fxml'.";
         assert tblRaces != null : "fx:id=\"tblRaces\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtKmMaxRace != null : "fx:id=\"txtKmMaxRace\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtNMaxRaces != null : "fx:id=\"txtNMaxRaces\" was not injected: check your FXML file 'Scene.fxml'.";

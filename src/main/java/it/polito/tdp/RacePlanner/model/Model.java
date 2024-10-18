@@ -467,7 +467,7 @@ public class Model {
 		
 		double media = sum / listLevel.size();
 		
-		if(media > 0 && media <= 0.5)
+		if(media >= 0 && media <= 0.5)
 			return "Principiante";
 		else if(media > 0.5 && media <= 1.4)
 			return "Intermedio";
