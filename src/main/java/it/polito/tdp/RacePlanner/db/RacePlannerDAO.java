@@ -114,7 +114,7 @@ public class RacePlannerDAO {
 	
 	public List<Race> getRaces(Integer anno, List<String> categorie,
 			List<String> continenti, List<String> nazioni) {
-		StringBuilder sql = new StringBuilder("SELECT r.* FROM races r, continents c, countries n "
+		StringBuilder sql = new StringBuilder("SELECT r.*, n.Name FROM races r, continents c, countries n "
 				+ "WHERE r.Continent=c.Code AND r.Country=n.Code AND r.Year=? ");
 		
 		if(categorie!=null && !categorie.isEmpty()) {
@@ -176,9 +176,9 @@ public class RacePlannerDAO {
 				LocalDate data = dateFromNumDays(res.getInt("Year"), res.getInt("Day"));
 				result.add(new Race(res.getInt("RaceUID"), res.getInt("Year"), data,
 						res.getString("RaceTitle"), res.getInt("NParticipants"), res.getString("RaceCategory"),
-						res.getDouble("Distance"), res.getInt("ElevationGain"), res.getDouble("MeanFinishTime"),
+						res.getFloat("Distance"), res.getInt("ElevationGain"), res.getDouble("MeanFinishTime"),
 						res.getDouble("WinningTime"), res.getDouble("LastTime"), res.getInt("NDNF"), res.getInt("NWomen"),
-						res.getString("RawLocation"), res.getString("Continent"), res.getString("Country")));
+						res.getString("RawLocation"), res.getString("Continent"), res.getString("Name")));
 			}
 			
 			conn.close();
@@ -197,6 +197,39 @@ public class RacePlannerDAO {
 		LocalDate inizio = LocalDate.of(year, 1, 1);
 		LocalDate data = inizio.plusDays(day);
 		return data;
+	}
+	
+	public List<Race> getRacesFYL(int anno, String categoria, String nazione) {
+		String sql = "SELECT  r.*, n.Name "
+				+ "FROM races r, countries n WHERE r.Country=n.Code "
+				+ "AND r.Year=? AND r.RaceCategory=? AND n.Name=?";
+		List<Race> result = new ArrayList<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			st.setString(2, categoria);
+			st.setString(3, nazione);
+			ResultSet res = st.executeQuery();
+			
+			while(res.next()) {
+				LocalDate data = dateFromNumDays(res.getInt("Year"), res.getInt("Day"));
+				result.add(new Race(res.getInt("RaceUID"), res.getInt("Year"), data,
+						res.getString("RaceTitle"), res.getInt("NParticipants"), res.getString("RaceCategory"),
+						res.getFloat("Distance"), res.getInt("ElevationGain"), res.getDouble("MeanFinishTime"),
+						res.getDouble("WinningTime"), res.getDouble("LastTime"), res.getInt("NDNF"), res.getInt("NWomen"),
+						res.getString("RawLocation"), res.getString("Continent"), res.getString("Name")));
+			}
+			
+			conn.close();
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL Error");
+		}
+		
+		return result;
 	}
  
 }

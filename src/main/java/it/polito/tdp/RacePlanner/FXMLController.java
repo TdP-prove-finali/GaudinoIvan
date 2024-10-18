@@ -2,10 +2,15 @@ package it.polito.tdp.RacePlanner;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -31,7 +36,10 @@ public class FXMLController {
 	
 	private Model model;
 	private boolean isFavRaceEmpty;
-
+	Map<TextField, ComboBox<Race>> txtTimeMap;
+	Map<Race, LocalTime> raceTimeMap;
+	String livelloAbilita;
+	
     @FXML
     private ResourceBundle resources;
 
@@ -141,7 +149,7 @@ public class FXMLController {
     private TableColumn<Race, Integer> colElevGain;
 
     @FXML
-    private TableColumn<Race, Double> colKm;
+    private TableColumn<Race, Float> colKm;
 
     @FXML
     private TableColumn<Race, String> colName;
@@ -193,7 +201,51 @@ public class FXMLController {
 
     @FXML
     void doFindLevel(ActionEvent event) {
-
+    	lblLevel.setStyle("-fx-text-fill: black; -fx-font-size: 16px;");
+    	int cntNotNull = 0;
+    	for(TextField txtTime : this.txtTimeMap.keySet()) {
+    		if(!txtTime.getText().equals(""))
+    			cntNotNull++;
+    		if(cntNotNull==2)
+    			break;
+    	}
+    	
+    	if(cntNotNull<2) {
+    		lblLevel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+    		lblLevel.setText("Inserisci i dati di almeno 2 gare.");
+    		return;
+    	}
+    	
+    	this.raceTimeMap = new HashMap<>();
+    	DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("H:mm:ss");
+    	
+    	for(TextField txtTime : this.txtTimeMap.keySet()) {
+    		LocalTime tempoDiGara;
+    		if(!txtTime.getText().equals("")) {
+    			try {
+    				tempoDiGara = LocalTime.parse(txtTime.getText(), timeFormat);
+    				Race gara = this.txtTimeMap.get(txtTime).getValue();
+    				if(this.raceTimeMap.containsKey(gara)) {
+    					lblLevel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+    					lblLevel.setText("Inserisci i dati di almeno 2 gare diverse.");
+    		    		return;
+    				}
+    				this.raceTimeMap.put(gara, tempoDiGara);
+    			} catch (DateTimeParseException e){
+    				lblLevel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+    				lblLevel.setText("Attenzione: il tempo deve essere nel formato ore:minuti:secondi");
+    				return;
+    			}
+    		}
+    	}
+    	
+    	this.livelloAbilita = model.findLevel(this.raceTimeMap);
+    	if(this.livelloAbilita==null) {
+    		lblLevel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+    		lblLevel.setText("Si è verificato un errore. Riprova.");
+    		return;
+    	}
+    	lblLevel.setText("Il tuo livello di abilità è: "+this.livelloAbilita);
     }
 
     @FXML
@@ -223,10 +275,10 @@ public class FXMLController {
             	}
         	}
         	
-        	Double maxKm = null;
+        	Float maxKm = null;
         	if(!txtKmMaxRace.getText().equals("")) {
         		try {
-	        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+	        		maxKm = Float.parseFloat(txtKmMaxRace.getText());
 	        	} catch(NumberFormatException e) {
 	        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido.");
 	        		return;
@@ -238,7 +290,17 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
+    			Collections.sort(nazioni);
+    			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
+    			for(int i=0; i<nazioni.size(); i++) {
+    				txtResult.appendText(nazioni.get(i));
+    				if(i<nazioni.size()-1)
+    					txtResult.appendText(", ");
+    				else
+    					txtResult.appendText(")");
+    			}
     		} else {
     			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
@@ -276,10 +338,10 @@ public class FXMLController {
             	}
         	}
         	
-        	Double maxKm = null;
+        	Float maxKm = null;
         	if(!txtKmMaxRace.getText().equals("")) {
         		try {
-	        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+	        		maxKm = Float.parseFloat(txtKmMaxRace.getText());
 	        	} catch(NumberFormatException e) {
 	        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido.");
 	        		return;
@@ -291,7 +353,17 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
+    			Collections.sort(nazioni);
+    			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
+    			for(int i=0; i<nazioni.size(); i++) {
+    				txtResult.appendText(nazioni.get(i));
+    				if(i<nazioni.size()-1)
+    					txtResult.appendText(", ");
+    				else
+    					txtResult.appendText(")");
+    			}
     		} else {
     			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
@@ -330,10 +402,10 @@ public class FXMLController {
             	}
         	}
         	
-        	Double maxKm = null;
+        	Float maxKm = null;
         	if(!txtKmMaxRace.getText().equals("")) {
         		try {
-	        		maxKm = Double.parseDouble(txtKmMaxRace.getText());
+	        		maxKm = Float.parseFloat(txtKmMaxRace.getText());
 	        	} catch(NumberFormatException e) {
 	        		lblWarnings.setText("Attenzione: campo \"Km massimi per gara\" non valido.");
 	        		return;
@@ -345,7 +417,17 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" Km\n");
-    			txtResult.appendText("Numero di nazioni: "+model.getNazioniSoluzione());
+    			//txtResult.appendText(String.format("Kilometri totali: %.1f Km\n",model.getKmTot()));
+    			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
+    			Collections.sort(nazioni);
+    			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
+    			for(int i=0; i<nazioni.size(); i++) {
+    				txtResult.appendText(nazioni.get(i));
+    				if(i<nazioni.size()-1)
+    					txtResult.appendText(", ");
+    				else
+    					txtResult.appendText(")");
+    			}
     		} else {
     			lblWarnings.setText("Nessuna soluzione trovata. Prova a modificare le tue scelte");
     		}
@@ -412,7 +494,8 @@ public class FXMLController {
 
     @FXML
     void doSave(ActionEvent event) {
-
+    	// TODO devo switchare tab
+    	cmbLevel.setValue(this.livelloAbilita);
     }
     
     // gestisco l'azione di modifica selezione su cmbLevel
@@ -481,6 +564,83 @@ public class FXMLController {
     		ckCmbNations.getItems().addAll(model.getCountries());
     	}
     }
+    
+    // gestisco l'azione di modifica selezione sulle ComboBox nel tab "Scopri il tuo livello"
+    @FXML
+    void handleCmbFYLR1(ActionEvent event) {
+    	handleCmbFYLGeneric(cmbYearR1, cmbCatR1, cmbNationR1, cmbNameR1, txtTimeR1);
+    }
+    
+    @FXML
+    void handleCmbFYLR2(ActionEvent event) {
+    	handleCmbFYLGeneric(cmbYearR2, cmbCatR2, cmbNationR2, cmbNameR2, txtTimeR2);
+    }
+    
+    @FXML
+    void handleCmbFYLR3(ActionEvent event) {
+    	handleCmbFYLGeneric(cmbYearR3, cmbCatR3, cmbNationR3, cmbNameR3, txtTimeR3);
+    }
+    
+    @FXML
+    void handleCmbFYLR4(ActionEvent event) {
+    	handleCmbFYLGeneric(cmbYearR4, cmbCatR4, cmbNationR4, cmbNameR4, txtTimeR4);    
+    }
+    
+    @FXML
+    void handleCmbFYLR5(ActionEvent event) {
+		handleCmbFYLGeneric(cmbYearR5, cmbCatR5, cmbNationR5, cmbNameR5, txtTimeR5);
+    }
+    
+    private void handleCmbFYLGeneric(ComboBox<Integer> cmbYear, ComboBox<String> cmbCat,
+    		ComboBox<String> cmbNation, ComboBox<Race> cmbName, TextField txtTime) {
+    	txtTime.clear();
+    	cmbName.getItems().clear();
+    	Integer anno = cmbYear.getValue();
+    	String categoria = cmbCat.getValue();
+    	String nazione = cmbNation.getValue();
+    	if(anno!=null && categoria!=null && nazione!=null) {
+    		List<Race> racesFYL = model.getRacesFYL(anno, categoria, nazione);
+    		if(racesFYL!=null && !racesFYL.isEmpty()) {
+    			cmbName.setDisable(false);
+    			cmbName.getItems().addAll(racesFYL);
+    		} else
+    			cmbName.setDisable(true);
+    	} else 
+    		cmbName.setDisable(true);
+    }
+    
+    @FXML
+    void handleCmbNameFYLR1(ActionEvent event) {
+    	handleCmbNameFYLGeneric(cmbNameR1, txtTimeR1);
+    }
+    
+    @FXML
+    void handleCmbNameFYLR2(ActionEvent event) {
+    	handleCmbNameFYLGeneric(cmbNameR2, txtTimeR2);
+    }
+    
+    @FXML
+    void handleCmbNameFYLR3(ActionEvent event) {
+    	handleCmbNameFYLGeneric(cmbNameR3, txtTimeR3);
+    }
+    
+    @FXML
+    void handleCmbNameFYLR4(ActionEvent event) {
+    	handleCmbNameFYLGeneric(cmbNameR4, txtTimeR4);
+    }
+    
+    @FXML
+    void handleCmbNameFYLR5(ActionEvent event) {
+    	handleCmbNameFYLGeneric(cmbNameR5, txtTimeR5);
+    }
+    
+    private void handleCmbNameFYLGeneric(ComboBox<Race> cmbName, TextField txtTime) {
+    	txtTime.clear();
+    	if(cmbName.getValue()!=null)
+    		txtTime.setDisable(false);
+    	else
+    		txtTime.setDisable(true);
+    }
 
     @FXML
     void initialize() {
@@ -536,14 +696,26 @@ public class FXMLController {
         assert txtTimeR4 != null : "fx:id=\"txtTimeR4\" was not injected: check your FXML file 'Scene.fxml'.";
         assert txtTimeR5 != null : "fx:id=\"txtTimeR5\" was not injected: check your FXML file 'Scene.fxml'.";
         
+        this.txtTimeMap = new HashMap<>();
+        this.txtTimeMap.put(txtTimeR1, cmbNameR1);
+        this.txtTimeMap.put(txtTimeR2, cmbNameR2);
+        this.txtTimeMap.put(txtTimeR3, cmbNameR3);
+        this.txtTimeMap.put(txtTimeR4, cmbNameR4);
+        this.txtTimeMap.put(txtTimeR5, cmbNameR5);
+        
         txtResult.setStyle("-fx-font-family: monospace");
         
+        lblInstructions.setText("Qui puoi calcolare il tuo livello di abilità sulla base dei risultati che hai ottenuto"
+        		+ " nelle tue gare. Inserisci i dati di almeno 2 gare (anno, categoria gara , nazione,"
+        		+ " nome gara, tempo ottenuto) nelle righe disponibili. Puoi inserire fino a 5 gare."
+        		+ " Dopo aver compilato, premi \"Scopri il tuo livello\" per calcolare il tuo livello di abilità."
+        		+ " Una volta ottenuto il livello, premi \"Salva\" per confermare e tornare alla tab Principale.");
+        
         colDate.setCellValueFactory(new PropertyValueFactory<Race, LocalDate>("date"));
-        // TODO forse gambiando getDate in Race mi cambia la visualizzazione, PROVARE
         colPlace.setCellValueFactory(new PropertyValueFactory<Race, String>("rawLocation"));
         colName.setCellValueFactory(new PropertyValueFactory<Race, String>("raceTitle"));
         colCategory.setCellValueFactory(new PropertyValueFactory<Race, String>("raceCategory"));
-        colKm.setCellValueFactory(new PropertyValueFactory<Race, Double>("distance"));
+        colKm.setCellValueFactory(new PropertyValueFactory<Race, Float>("distance"));
         colElevGain.setCellValueFactory(new PropertyValueFactory<Race, Integer>("elevationGain"));
         
         List<String> livelliAbilita = new ArrayList<>();

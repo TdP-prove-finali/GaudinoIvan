@@ -1,5 +1,6 @@
 package it.polito.tdp.RacePlanner.model;
 
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -29,7 +30,7 @@ public class Model {
 	private List<Race> gareValide;
 	
 	private List<Race> best;
-	private double kmCount;
+	private float kmCount;
 	private int nazioniCount;
 	
 	public Model() {
@@ -68,13 +69,9 @@ public class Model {
 		this.esperto = new Atleta("Esperto", categorieEsperto, giorniEsperto);
 	}
 	
-	// TODO servono i controlli? Se sì, gestire errore nel controller
 	public List<String> getMesi() {
-		if(this.mapMonths!=null && !this.mapMonths.keySet().isEmpty()) {
-			List<String> mesi = new ArrayList<>(this.mapMonths.values());
-			return mesi;
-		}
-		return null;
+		List<String> mesi = new ArrayList<>(this.mapMonths.values());
+		return mesi;
 	}
 	
 	public List<Integer> getYears() {
@@ -152,7 +149,16 @@ public class Model {
 		return this.gareValide;
 	}
 	
-	public List<Race> massimizza(String button, String lvl, String favCat, Race favRace, Integer maxGare, Double maxKm) {
+	public List<Race> getRacesFYL(int anno, String categoria, String nazione) {
+		List<Race> racesFYL = dao.getRacesFYL(anno, categoria, nazione);
+		if(racesFYL==null || racesFYL.isEmpty())
+			return null;
+		
+		Collections.sort(racesFYL);
+		return racesFYL;
+	}
+	
+	public List<Race> massimizza(String button, String lvl, String favCat, Race favRace, Integer maxGare, Float maxKm) {
 		Collections.sort(this.gareValide, new Comparator<Race>() {
 			@Override
 			public int compare(Race r1, Race r2) {
@@ -168,8 +174,8 @@ public class Model {
 		int cntFavCat = 0;
 		int cnt100K = 0;
 		int cnt100M = 0;
-		double cntKm = 0;
-		//List<String> mapNazioni = new ArrayList<>();
+		float cntKm = 0;
+		//List<String> listNazioni = new ArrayList<>();
 		Map<String, Integer> mapNazioni = new HashMap<>();
 		Set<String> setNazioni = new HashSet<>();
 		
@@ -222,7 +228,7 @@ public class Model {
 		return this.best;
 	}
 
-	private void massimizzaGare(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
+	private void massimizzaGare(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
 			int cntFavCat, int cnt100K, int cnt100M) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
@@ -280,8 +286,8 @@ public class Model {
 		}
 	}
 	
-	private void massimizzaKm(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
-			int cntFavCat, int cnt100K, int cnt100M, double cntKm) {
+	private void massimizzaKm(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
+			int cntFavCat, int cnt100K, int cnt100M, float cntKm) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
@@ -336,13 +342,13 @@ public class Model {
 		}
 	}
 	
-	private void massimizzaNazioni(String lvl, List<Race> parziale, String favCat, Integer maxGare, Double maxKm,
+	private void massimizzaNazioni(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
 			int cntFavCat, int cnt100K, int cnt100M, Map<String, Integer> mapNazioni, Set<String> setNazioni) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
 		
-		//setNazioni = new HashSet<>(mapNazioni);
+		//setNazioni = new HashSet<>(listNazioni);
 		setNazioni = mapNazioni.keySet();
 		int cntNazioni = setNazioni.size();
 		if(cntNazioni > this.nazioniCount) {
@@ -379,7 +385,7 @@ public class Model {
 				cnt100M++;
 			}
 			
-			//mapNazioni.add(gara.getCountry());
+			//listNazioni.add(gara.getCountry());
 			
 			String country = gara.getCountry();
 			mapNazioni.put(country, mapNazioni.getOrDefault(country, 0) + 1);
@@ -396,7 +402,7 @@ public class Model {
 				cnt100M--;
 			}
 			
-			//mapNazioni.remove(parziale.get(parziale.size()-1).getCountry());	
+			//listNazioni.remove(parziale.get(parziale.size()-1).getCountry());	
 			
 			if(mapNazioni.get(country) == 1) {
 				mapNazioni.remove(country);
@@ -418,32 +424,66 @@ public class Model {
 		return true;
 	}
 	
-	public Double getKmTot() {
+	public Float getKmTot() {
 		if(this.best==null || this.best.isEmpty())
 			return null;
 		
-		if(this.kmCount!=0)
-			return Math.round(kmCount*100.0)/100.0;
-		
-		double kmTot = 0;
+		float kmTot = 0;
 		for(Race r : this.best) {
 			kmTot += r.getDistance();
 		}
-		return kmTot;
+		return Math.round(kmTot * 10) / 10.0f;
 	}
 	
-	public Integer getNazioniSoluzione() {
+	public Set<String> getNazioniSoluzione() {
 		if(this.best==null || this.best.isEmpty())
 			return null;
-		
-		if(this.nazioniCount!=0)
-			return this.nazioniCount;
 		
 		Set<String> nazioni = new HashSet<>();
 		for(Race r : this.best) {
 			nazioni.add(r.getCountry());
 		}
-		return nazioni.size();
+		return nazioni;
+	}
+	
+	public String findLevel(Map<Race, LocalTime> raceTimeMap) {
+		List<Integer> listLevel = new ArrayList<>();
+		for(Race gara : raceTimeMap.keySet()) {
+			double inf = (gara.getMeanFinishTime() + gara.getLastTime()) / 2;
+			double sup = (gara.getMeanFinishTime() + gara.getWinningTime()) / 2;
+			double tempoDecimale = localTimeToDecimalHours(raceTimeMap.get(gara));
+			if(tempoDecimale >= inf)
+				listLevel.add(0);
+			else if(tempoDecimale < inf && tempoDecimale > sup)
+				listLevel.add(1);
+			else if(tempoDecimale <= sup)
+				listLevel.add(2);
+		}
+		
+		int sum = 0;
+		for(Integer lvl : listLevel) {
+			sum += lvl;
+		}
+		
+		double media = sum / listLevel.size();
+		
+		if(media > 0 && media <= 0.5)
+			return "Principiante";
+		else if(media > 0.5 && media <= 1.4)
+			return "Intermedio";
+		else if(media > 1.4 && media <= 2)
+			return "Esperto";
+		
+		return null;
+	}
+
+	private double localTimeToDecimalHours(LocalTime time) {
+		int ore = time.getHour();
+		int minuti = time.getMinute();
+		int secondi = time.getSecond();
+		double oreDecimali = ore + (minuti/60.0) + (secondi/3600.0);
+		return oreDecimali;
+		
 	}
 	
 }

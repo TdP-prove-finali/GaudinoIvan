@@ -10,7 +10,7 @@ public class Race implements Comparable<Race>{
 	private String raceTitle;
 	private int nParticipants;
 	private String raceCategory;
-	private double distance;
+	private float distance;
 	private int elevationGain;
 	private double meanFinishTime;
 	private double winningTime;
@@ -22,7 +22,7 @@ public class Race implements Comparable<Race>{
 	private String country;
 	
 	public Race(Integer raceUID, Integer year, LocalDate date, String raceTitle, int nParticipants, String raceCategory,
-			double distance, int elevationGain, double meanFinishTime, double winningTime, double lastTime, int nDNF,
+			float distance, int elevationGain, double meanFinishTime, double winningTime, double lastTime, int nDNF,
 			int nWomen, String rawLocation, String continent, String country) {
 		super();
 		this.raceUID = raceUID;
@@ -91,11 +91,11 @@ public class Race implements Comparable<Race>{
 		this.raceCategory = raceCategory;
 	}
 
-	public double getDistance() {
+	public float getDistance() {
 		return distance;
 	}
 
-	public void setDistance(double distance) {
+	public void setDistance(float distance) {
 		this.distance = distance;
 	}
 
