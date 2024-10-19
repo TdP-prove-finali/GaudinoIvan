@@ -24,7 +24,7 @@ public class FXMLGuideController {
         		+ " Trail Running in base alle tue preferenze e obiettivi. Utilizza i filtri e le opzioni disponibili"
         		+ " per creare la tua pianificazione ottimale. Puoi anche calcolare il tuo livello di abilità"
         		+ " aprendo la scheda \"Scopri il tuo livello\" e seguendo le istruzioni.\r\n"
-        		+ "Dopo aver selezionato i filtri, puoi scegliere quale obiettivo vuoi perseguire nella tua pianificazione: \r\n"
+        		+ "Dopo aver selezionato i filtri, puoi scegliere quale obiettivo vuoi perseguire nella tua pianificazione:\r\n"
         		+ "• Massimizzare il numero di gare\r\n"
         		+ "• Massimizzare i km percorsi\r\n"
         		+ "• Massimizzare il numero di nazioni visitate\r\n"

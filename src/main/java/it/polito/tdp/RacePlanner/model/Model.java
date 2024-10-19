@@ -45,7 +45,6 @@ public class Model {
 		
 		// creo atleta principiante
 		List<String> categoriePrincipiante = Arrays.asList("20K","50K"); //lista fissa non modificabile
-		//List<String> categoriePrincipiante = new ArrayList<>(Arrays.asList("20K","50K"));
 		Map<String, Integer> giorniPrincipiante = new HashMap<>();
 		giorniPrincipiante.put("20K", 40);
 		giorniPrincipiante.put("50K", 70);
@@ -121,7 +120,10 @@ public class Model {
 			}
 			this.gareValide = gareValideFiltered;
 		}
-		System.out.println(this.gareValide.size()); // TODO DA TOGLIERE
+		if(this.gareValide.size()>160) 
+			System.out.println(this.gareValide.size()+" valid entries - Slow recursion - Refine the filter selection");
+		else if(this.gareValide.size()<=160 && this.gareValide.size()!=0)
+			System.out.println(this.gareValide.size()+" valid entries - Recursion can find solution in reasonable time");
 	}
 	
 	// applico il filtro di "Categoria preferita" sulla lista di gare valide
@@ -175,13 +177,11 @@ public class Model {
 		int cnt100K = 0;
 		int cnt100M = 0;
 		float cntKm = 0;
-		//List<String> listNazioni = new ArrayList<>();
 		Map<String, Integer> mapNazioni = new HashMap<>();
 		Set<String> setNazioni = new HashSet<>();
 		
 		switch(button) {
 		case "Gare":
-			// TODO implementare filtro favCat (o eliminarlo)
 			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
 			break;
 		case "Km":
@@ -235,11 +235,11 @@ public class Model {
 		}
 		
 		if(parziale.size() > best.size()) {
-			/*if(favCat!=null) {
+			if(favCat!=null) {
 				int minGareFavCat = (parziale.size()+1)/2;
 				if(cntFavCat < minGareFavCat)
 					return;
-			}*/
+			}
 			this.best = new ArrayList<>(parziale);
 		}
 	
@@ -250,8 +250,8 @@ public class Model {
 			if(maxKm!=null && gara.getDistance() > maxKm)
 				continue;
 			
-//			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-//				continue;
+			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
+				continue;
 			
 			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
 				continue;
@@ -271,8 +271,10 @@ public class Model {
 			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
 				cnt100M++;
 			}
+			
 			parziale.add(gara);
 			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
+			
 			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
 				cntFavCat--;
 			}
@@ -282,6 +284,7 @@ public class Model {
 			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
 				cnt100M--;
 			}
+			
 			parziale.remove(parziale.size()-1);
 		}
 	}
@@ -293,6 +296,11 @@ public class Model {
 		}
 		
 		if(cntKm > this.kmCount) {
+			if(favCat!=null) {
+				int minGareFavCat = (parziale.size()+1)/2;
+				if(cntFavCat < minGareFavCat)
+					return;
+			}
 			this.best = new ArrayList<>(parziale);
 			this.kmCount = cntKm;
 		}
@@ -304,8 +312,8 @@ public class Model {
 			if(maxKm!=null && gara.getDistance() > maxKm)
 				continue;
 			
-//			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-//				continue;
+			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
+				continue;
 			
 			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
 				continue;
@@ -325,9 +333,11 @@ public class Model {
 			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
 				cnt100M++;
 			}
+			
 			cntKm += gara.getDistance();
 			parziale.add(gara);
 			massimizzaKm(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, cntKm);
+			
 			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
 				cntFavCat--;
 			}
@@ -337,6 +347,7 @@ public class Model {
 			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
 				cnt100M--;
 			}
+			
 			cntKm -= gara.getDistance();
 			parziale.remove(parziale.size()-1);
 		}
@@ -348,10 +359,14 @@ public class Model {
 			return;
 		}
 		
-		//setNazioni = new HashSet<>(listNazioni);
 		setNazioni = mapNazioni.keySet();
 		int cntNazioni = setNazioni.size();
 		if(cntNazioni > this.nazioniCount) {
+			if(favCat!=null) {
+				int minGareFavCat = (parziale.size()+1)/2;
+				if(cntFavCat < minGareFavCat)
+					return;
+			}
 			this.best = new ArrayList<>(parziale);
 			this.nazioniCount = cntNazioni;
 		}
@@ -363,8 +378,8 @@ public class Model {
 			if(maxKm!=null && gara.getDistance() > maxKm)
 				continue;
 			
-//			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-//				continue;
+			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
+				continue;
 			
 			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
 				continue;
@@ -385,13 +400,11 @@ public class Model {
 				cnt100M++;
 			}
 			
-			//listNazioni.add(gara.getCountry());
-			
 			String country = gara.getCountry();
 			mapNazioni.put(country, mapNazioni.getOrDefault(country, 0) + 1);
-			
 			parziale.add(gara);
 			massimizzaNazioni(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, mapNazioni, setNazioni);
+			
 			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
 				cntFavCat--;
 			}
@@ -400,9 +413,7 @@ public class Model {
 			}
 			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
 				cnt100M--;
-			}
-			
-			//listNazioni.remove(parziale.get(parziale.size()-1).getCountry());	
+			}	
 			
 			if(mapNazioni.get(country) == 1) {
 				mapNazioni.remove(country);

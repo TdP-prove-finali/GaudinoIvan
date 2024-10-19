@@ -4,7 +4,7 @@ public class TestDAO {
 
 	public static void main(String[] args) {
 
-		RacePlannerDAO dao = new RacePlannerDAO();
+		//RacePlannerDAO dao = new RacePlannerDAO();
 		System.out.println();
 		
 	}

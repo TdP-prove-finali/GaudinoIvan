@@ -45,11 +45,11 @@
                                             </columnConstraints>
                                             <rowConstraints>
                                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                              <children>
@@ -58,23 +58,23 @@
                                                       <Font name="Arial" size="13.0" />
                                                    </font>
                                                 </Label>
-                                                <Label text="Categoria preferita" GridPane.rowIndex="1">
+                                                <Label text="Categoria preferita" GridPane.rowIndex="5">
                                                    <font>
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
-                                                <Label text="Anno" GridPane.rowIndex="2">
+                                                <Label text="Anno" GridPane.rowIndex="1">
                                                    <font>
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
-                                                <Label text="Continenti" GridPane.rowIndex="3">
+                                                <Label text="Continenti" GridPane.rowIndex="2">
                                                    <font>
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
-                                                <Label text="Nazioni" GridPane.rowIndex="4">
+                                                <Label text="Nazioni" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
-                                                <Label text="Mesi da escludere" GridPane.rowIndex="5">
+                                                <Label text="Mesi da escludere" GridPane.rowIndex="4">
                                                    <font>
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
@@ -83,11 +83,11 @@
                                                       <Font name="Arial" size="13.0" />
                                                    </font></Label>
                                                 <ComboBox fx:id="cmbLevel" onAction="#handleCmbLevel" prefWidth="180.0" GridPane.columnIndex="1" />
-                                                <ComboBox fx:id="cmbCategory" onAction="#handleCmbAction" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <ComboBox fx:id="cmbYear" onAction="#handleCmbAction" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <CheckComboBox fx:id="ckCmbContinents" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                <CheckComboBox fx:id="ckCmbNations" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                <CheckComboBox fx:id="ckCmbMonths" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <ComboBox fx:id="cmbCategory" onAction="#handleCmbAction" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <ComboBox fx:id="cmbYear" onAction="#handleCmbAction" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <CheckComboBox fx:id="ckCmbContinents" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <CheckComboBox fx:id="ckCmbNations" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <CheckComboBox fx:id="ckCmbMonths" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                 <ComboBox fx:id="cmbFavRace" disable="true" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                              </children>
                                           </GridPane>
@@ -179,12 +179,12 @@
                                        <children>
                                           <TableView fx:id="tblRaces">
                                             <columns>
-                                              <TableColumn fx:id="colDate" maxWidth="75.0" prefWidth="75.0" text="Data" />
-                                              <TableColumn fx:id="colPlace" maxWidth="95.0" prefWidth="95.0" text="Luogo" />
-                                                <TableColumn fx:id="colName" maxWidth="240.0" prefWidth="240.0" text="Nome" />
-                                                <TableColumn fx:id="colCategory" maxWidth="65.0" prefWidth="65.0" text="Categoria" />
-                                                <TableColumn fx:id="colKm" maxWidth="65.0" prefWidth="65.0" text="Km" />
-                                                <TableColumn fx:id="colElevGain" maxWidth="65.0" prefWidth="65.0" text="Dislivello" />
+                                              <TableColumn fx:id="colDate" maxWidth="100.0" prefWidth="75.0" text="Data" />
+                                              <TableColumn fx:id="colPlace" maxWidth="250.0" prefWidth="150.0" text="Luogo" />
+                                                <TableColumn fx:id="colName" maxWidth="400.0" prefWidth="240.0" text="Nome" />
+                                                <TableColumn fx:id="colCategory" maxWidth="100.0" prefWidth="65.0" text="Categoria" />
+                                                <TableColumn fx:id="colKm" maxWidth="100.0" prefWidth="65.0" text="Km" />
+                                                <TableColumn fx:id="colElevGain" maxWidth="100.0" prefWidth="65.0" text="Dislivello" />
                                             </columns>
                                           </TableView>
                                           <TextArea fx:id="txtResult" editable="false" maxWidth="350.0" prefHeight="150.0" wrapText="true">
@@ -580,7 +580,7 @@
                               </VBox>
                            </children>
                            <padding>
-                              <Insets bottom="10.0" left="40.0" right="10.0" top="10.0" />
+                              <Insets bottom="10.0" left="75.0" right="10.0" top="10.0" />
                            </padding>
                         </VBox>
                      </children></AnchorPane>
@@ -590,9 +590,9 @@
       </TabPane>
    </center>
    <top>
-      <ImageView fitHeight="90.0" fitWidth="964.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="90.0" fitWidth="1018.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
          <BorderPane.margin>
-            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
          </BorderPane.margin>
          <image>
             <Image url="@../imgTitle.png" />

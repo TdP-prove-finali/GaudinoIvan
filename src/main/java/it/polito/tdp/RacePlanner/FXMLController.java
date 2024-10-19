@@ -306,7 +306,6 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -323,7 +322,6 @@ public class FXMLController {
     		
     	} else {
     		lblWarnings.setText("Attenzione: \"Livello di abilità\" e \"Anno\" sono campi obbligatori.");
-    		// TODO potrei modificare il colore del bordo dei campi non compilati
     	}
     }
 
@@ -369,7 +367,6 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -386,7 +383,6 @@ public class FXMLController {
     		
     	} else {
     		lblWarnings.setText("Attenzione: \"Livello di abilità\" e \"Anno\" sono campi obbligatori.");
-    		// TODO potrei modificare il colore del bordo dei campi non compilati
     	}
     }
 
@@ -433,7 +429,6 @@ public class FXMLController {
     			tblRaces.setItems(FXCollections.observableArrayList(racePlan));
     			txtResult.appendText("Numero di gare: "+racePlan.size()+"\n");
     			txtResult.appendText("Kilometri totali: "+model.getKmTot()+" km\n");
-    			//txtResult.appendText(String.format("Kilometri totali: %.1f km\n",model.getKmTot()));
     			List<String> nazioni = new ArrayList<>(model.getNazioniSoluzione());
     			Collections.sort(nazioni);
     			txtResult.appendText("Numero di nazioni: "+nazioni.size()+" (");
@@ -450,7 +445,6 @@ public class FXMLController {
     		
     	} else {
     		lblWarnings.setText("Attenzione: \"Livello di abilità\" e \"Anno\" sono campi obbligatori.");
-    		// TODO potrei modificare il colore del bordo dei campi non compilati
     	}
     }
 
@@ -510,7 +504,6 @@ public class FXMLController {
     	txtNMaxRaces.clear();
     	txtKmMaxRace.clear();
     	lblWarnings.setText("");
-    	// TODO resetto anche la table e txtResult?
     	tblRaces.getItems().clear();
     	txtResult.clear();
     }
