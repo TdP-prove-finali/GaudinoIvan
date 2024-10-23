@@ -6,7 +6,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.RacePlanner.FXMLGuideController">
    <center>
-      <Label fx:id="lblGuide" maxWidth="340.0" style="-fx-font-family: Roboto; -fx-font-size: 14;" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER">
+      <Label fx:id="lblGuide" maxWidth="400.0" style="-fx-font-family: Roboto; -fx-font-size: 14;" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </BorderPane.margin></Label>

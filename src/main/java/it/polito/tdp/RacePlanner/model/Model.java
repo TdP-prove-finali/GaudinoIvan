@@ -1,5 +1,6 @@
 package it.polito.tdp.RacePlanner.model;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -15,6 +16,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import org.jgrapht.Graph;
+import org.jgrapht.Graphs;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import it.polito.tdp.RacePlanner.db.RacePlannerDAO;
 
@@ -32,6 +38,14 @@ public class Model {
 	private List<Race> best;
 	private float kmCount;
 	private int nazioniCount;
+	private int cntFavCat;
+	private int cnt100K;
+	private int cnt100M;
+	private float cntKm;
+	private Map<String, Integer> mapNazioni;
+	private Set<String> setNazioni;
+	
+	private Graph<Race, DefaultWeightedEdge> grafo;
 	
 	public Model() {
 		this.dao = new RacePlannerDAO();
@@ -120,9 +134,9 @@ public class Model {
 			}
 			this.gareValide = gareValideFiltered;
 		}
-		if(this.gareValide.size()>160) 
+		if(this.gareValide.size()>=200) 
 			System.out.println(this.gareValide.size()+" valid entries - Slow recursion - Refine the filter selection");
-		else if(this.gareValide.size()<=160 && this.gareValide.size()!=0)
+		else if(this.gareValide.size()<200 && this.gareValide.size()!=0)
 			System.out.println(this.gareValide.size()+" valid entries - Recursion can find solution in reasonable time");
 	}
 	
@@ -160,7 +174,10 @@ public class Model {
 		return racesFYL;
 	}
 	
-	public List<Race> massimizza(String button, String lvl, String favCat, Race favRace, Integer maxGare, Float maxKm) {
+	private void creaGrafo(String lvl) {
+		this.grafo = new SimpleDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+		Graphs.addAllVertices(this.grafo, this.gareValide);
+		
 		Collections.sort(this.gareValide, new Comparator<Race>() {
 			@Override
 			public int compare(Race r1, Race r2) {
@@ -168,27 +185,72 @@ public class Model {
 			}	
 		});
 		
+		Atleta atleta = this.getAtleta(lvl);
+		for(int i=0; i<gareValide.size(); i++) {
+			Race r1 = gareValide.get(i);
+			LocalDate dateR1= r1.getDate();
+			int giorniMin = atleta.getMapCategoriaGiorni().get(r1.getRaceCategory());
+			for(int j=i+1; j<gareValide.size(); j++) {
+				Race r2 = gareValide.get(j);
+				LocalDate dateR2= r2.getDate();
+				long giorniTraGare = ChronoUnit.DAYS.between(dateR1, dateR2);
+				if(giorniTraGare >= giorniMin && giorniTraGare >= 15) { //la minima distanza in giorni assoluta è 15
+					Graphs.addEdge(grafo, r1, r2, giorniTraGare);
+				}
+			}
+		}
+	}
+	
+	public List<Race> massimizza(String button, String lvl, String favCat, Race favRace, Integer maxGare, Float maxKm) {
+		this.creaGrafo(lvl);
 		this.best = new ArrayList<>();
 		this.kmCount = 0;
 		this.nazioniCount = 0;
-		List<Race> parziale = new ArrayList<>();
 		
-		int cntFavCat = 0;
-		int cnt100K = 0;
-		int cnt100M = 0;
-		float cntKm = 0;
-		Map<String, Integer> mapNazioni = new HashMap<>();
-		Set<String> setNazioni = new HashSet<>();
+		List<Race> parziale = new ArrayList<>();
 		
 		switch(button) {
 		case "Gare":
-			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
+			for(Race r : grafo.vertexSet()) {
+				if(!isAggiuntaValida(parziale, r, maxKm, favCat, lvl))
+					continue;
+				this.cntFavCat = 0;
+				this.cnt100K = 0;
+				this.cnt100M = 0;
+				parziale.add(r);
+				this.incrementaContatori(button, r, favCat, lvl);
+				massimizzaGare(button, lvl, parziale, favCat, maxGare, maxKm);
+				parziale.clear();
+			}
 			break;
 		case "Km":
-			massimizzaKm(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, cntKm);
+			for(Race r : grafo.vertexSet()) {
+				if(!isAggiuntaValida(parziale, r, maxKm, favCat, lvl))
+					continue;
+				this.cntFavCat = 0;
+				this.cnt100K = 0;
+				this.cnt100M = 0;
+				this.cntKm = 0;
+				parziale.add(r);
+				this.incrementaContatori(button, r, favCat, lvl);
+				massimizzaKm(button, lvl, parziale, favCat, maxGare, maxKm);
+				parziale.clear();
+			}
 			break;
 		case "Nazioni":
-			massimizzaNazioni(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, mapNazioni, setNazioni);
+			for(Race r : grafo.vertexSet()) {
+				if(!isAggiuntaValida(parziale, r, maxKm, favCat, lvl))
+					continue;
+				this.cntFavCat = 0;
+				this.cnt100K = 0;
+				this.cnt100M = 0;
+				this.mapNazioni = new HashMap<>();
+				this.setNazioni = new HashSet<>();
+				parziale.add(r);
+				this.incrementaContatori(button, r, favCat, lvl);
+				massimizzaNazioni(button, lvl, parziale, favCat, maxGare, maxKm);
+				parziale.clear();
+			}
 			break;
 		}
 		
@@ -228,133 +290,54 @@ public class Model {
 		return this.best;
 	}
 
-	private void massimizzaGare(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
-			int cntFavCat, int cnt100K, int cnt100M) {
+	private void massimizzaGare(String button, String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
 		
 		if(parziale.size() > best.size()) {
-			if(favCat!=null) {
-				int minGareFavCat = (parziale.size()+1)/2;
-				if(cntFavCat < minGareFavCat)
-					return;
-			}
 			this.best = new ArrayList<>(parziale);
 		}
-	
-		for(Race gara : this.gareValide) {
-			if(parziale.contains(gara)) 
-				continue;
+		
+		for(DefaultWeightedEdge e : grafo.outgoingEdgesOf(parziale.get(parziale.size()-1))) {
+			Race gara = Graphs.getOppositeVertex(grafo, e, parziale.get(parziale.size()-1));
+			if(!parziale.contains(gara) && isAggiuntaValida(parziale, gara, maxKm, favCat, lvl)) {
+				parziale.add(gara);
+				this.incrementaContatori(button, gara, favCat, lvl);
 				
-			if(maxKm!=null && gara.getDistance() > maxKm)
-				continue;
-			
-			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-				continue;
-			
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
-				continue;
-			
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && cnt100M >= 4)
-				continue;
-			
-			if(!vincoloGiorni(lvl, parziale, gara))
-				continue;
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat++;
+				massimizzaGare(button, lvl, parziale, favCat, maxGare, maxKm);
+				
+				parziale.remove(parziale.size()-1);
+				this.decrementaContatori(button, gara, favCat, lvl);
 			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K++;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M++;
-			}
-			
-			parziale.add(gara);
-			massimizzaGare(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M);
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat--;
-			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K--;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M--;
-			}
-			
-			parziale.remove(parziale.size()-1);
 		}
 	}
 	
-	private void massimizzaKm(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
-			int cntFavCat, int cnt100K, int cnt100M, float cntKm) {
+	private void massimizzaKm(String button, String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
 		
-		if(cntKm > this.kmCount) {
-			if(favCat!=null) {
-				int minGareFavCat = (parziale.size()+1)/2;
-				if(cntFavCat < minGareFavCat)
-					return;
-			}
+		if(this.cntKm > this.kmCount) {
 			this.best = new ArrayList<>(parziale);
-			this.kmCount = cntKm;
+			this.kmCount = this.cntKm;
 		}
-	
-		for(Race gara : this.gareValide) {
-			if(parziale.contains(gara)) 
-				continue;
+		
+		for(DefaultWeightedEdge e : grafo.outgoingEdgesOf(parziale.get(parziale.size()-1))) {
+			Race gara = Graphs.getOppositeVertex(grafo, e, parziale.get(parziale.size()-1));
+			if(!parziale.contains(gara) && isAggiuntaValida(parziale, gara, maxKm, favCat, lvl)) {
+				parziale.add(gara);
+				this.incrementaContatori(button, gara, favCat, lvl);
 				
-			if(maxKm!=null && gara.getDistance() > maxKm)
-				continue;
-			
-			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-				continue;
-			
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
-				continue;
-			
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && cnt100M >= 4)
-				continue;
-			
-			if(!vincoloGiorni(lvl, parziale, gara))
-				continue;
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat++;
+				massimizzaKm(button, lvl, parziale, favCat, maxGare, maxKm);
+				
+				parziale.remove(parziale.size()-1);
+				this.decrementaContatori(button, gara, favCat, lvl);
 			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K++;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M++;
-			}
-			
-			cntKm += gara.getDistance();
-			parziale.add(gara);
-			massimizzaKm(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, cntKm);
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat--;
-			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K--;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M--;
-			}
-			
-			cntKm -= gara.getDistance();
-			parziale.remove(parziale.size()-1);
-		}
+		}	
 	}
 	
-	private void massimizzaNazioni(String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm,
-			int cntFavCat, int cnt100K, int cnt100M, Map<String, Integer> mapNazioni, Set<String> setNazioni) {
+	private void massimizzaNazioni(String button, String lvl, List<Race> parziale, String favCat, Integer maxGare, Float maxKm) {
 		if(maxGare!=null && parziale.size() > maxGare) {
 			return;
 		}
@@ -362,77 +345,82 @@ public class Model {
 		setNazioni = mapNazioni.keySet();
 		int cntNazioni = setNazioni.size();
 		if(cntNazioni > this.nazioniCount) {
-			if(favCat!=null) {
-				int minGareFavCat = (parziale.size()+1)/2;
-				if(cntFavCat < minGareFavCat)
-					return;
-			}
 			this.best = new ArrayList<>(parziale);
 			this.nazioniCount = cntNazioni;
 		}
-	
-		for(Race gara : this.gareValide) {
-			if(parziale.contains(gara)) 
-				continue;
+		
+		for(DefaultWeightedEdge e : grafo.outgoingEdgesOf(parziale.get(parziale.size()-1))) {
+			Race gara = Graphs.getOppositeVertex(grafo, e, parziale.get(parziale.size()-1));
+			if(!parziale.contains(gara) && isAggiuntaValida(parziale, gara, maxKm, favCat, lvl)) {
+				parziale.add(gara);
+				this.incrementaContatori(button, gara, favCat, lvl);
 				
-			if(maxKm!=null && gara.getDistance() > maxKm)
-				continue;
-			
-			if(favCat!=null && !gara.getRaceCategory().equals(favCat) && cntFavCat < (parziale.size()+2)/2)
-				continue;
-			
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && cnt100K >= 4)
-				continue;
-			
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && cnt100M >= 4)
-				continue;
-			
-			if(!vincoloGiorni(lvl, parziale, gara))
-				continue;
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat++;
+				massimizzaNazioni(button, lvl, parziale, favCat, maxGare, maxKm);
+				
+				parziale.remove(parziale.size()-1);
+				this.decrementaContatori(button, gara, favCat, lvl);
 			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K++;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M++;
-			}
-			
+		}
+	}
+	
+	private boolean isAggiuntaValida(List<Race> parziale, Race gara, Float maxKm, String favCat, String lvl) {
+		if(maxKm!=null && gara.getDistance() > maxKm)
+			return false;
+		
+		if(favCat!=null && !gara.getRaceCategory().equals(favCat) && this.cntFavCat < (parziale.size()+2)/2)
+			return false;
+		
+		if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K") && this.cnt100K >= 4)
+			return false;
+		
+		if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M") && this.cnt100M >= 4)
+			return false;
+		
+		return true;
+	}
+	
+	private void incrementaContatori(String button, Race gara, String favCat, String lvl) {
+		if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+			this.cntFavCat++;
+		}
+		if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+			this.cnt100K++;
+		}
+		if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+			this.cnt100M++;
+		}
+		
+		if(button.equals("Km"))
+			this.cntKm += gara.getDistance();
+		
+		if(button.equals("Nazioni")) {
 			String country = gara.getCountry();
 			mapNazioni.put(country, mapNazioni.getOrDefault(country, 0) + 1);
-			parziale.add(gara);
-			massimizzaNazioni(lvl, parziale, favCat, maxGare, maxKm, cntFavCat, cnt100K, cnt100M, mapNazioni, setNazioni);
-			
-			if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
-				cntFavCat--;
-			}
-			if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
-				cnt100K--;
-			}
-			if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
-				cnt100M--;
-			}	
-			
+		}
+	}
+	
+	private void decrementaContatori(String button, Race gara, String favCat, String lvl) {
+		if(favCat!=null && gara.getRaceCategory().equals(favCat)) {
+			this.cntFavCat--;
+		}
+		if(lvl.equals("Intermedio") && gara.getRaceCategory().equals("100K")) {
+			this.cnt100K--;
+		}
+		if(lvl.equals("Esperto") && gara.getRaceCategory().equals("100M")) {
+			this.cnt100M--;
+		}
+		
+		if(button.equals("Km"))
+			this.cntKm -= gara.getDistance();
+		
+		if(button.equals("Nazioni")) {
+			String country = gara.getCountry();
 			if(mapNazioni.get(country) == 1) {
 				mapNazioni.remove(country);
 			} else {
 				mapNazioni.put(country, mapNazioni.get(country) - 1);
 			}
-			parziale.remove(parziale.size()-1);
-		}		
-	}
-
-	private boolean vincoloGiorni(String lvl, List<Race> parziale, Race gara) {
-		if(!parziale.isEmpty()) {
-			Atleta atleta = this.getAtleta(lvl);
-			int giorniMin = atleta.getMapCategoriaGiorni().get(parziale.get(parziale.size()-1).getRaceCategory());
-			long giorniTraGare = ChronoUnit.DAYS.between(parziale.get(parziale.size()-1).getDate(), gara.getDate());
-			if(giorniTraGare < giorniMin)
-				return false;
 		}
-		return true;
 	}
 	
 	public Float getKmTot() {

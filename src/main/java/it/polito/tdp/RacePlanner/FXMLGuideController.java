@@ -28,7 +28,8 @@ public class FXMLGuideController {
         		+ "• Massimizzare il numero di gare\r\n"
         		+ "• Massimizzare i km percorsi\r\n"
         		+ "• Massimizzare il numero di nazioni visitate\r\n"
-        		+ "Scopri quali sfide ti aspettano!");
+        		+ "Ti consigliamo di essere il più specifico possibile nella scelta delle preferenze per ottenere un risultato"
+        		+ " in tempi ragionevoli.\r\nScopri quali sfide ti aspettano!");
 
     }
 
