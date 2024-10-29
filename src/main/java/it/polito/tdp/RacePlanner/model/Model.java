@@ -134,9 +134,9 @@ public class Model {
 			}
 			this.gareValide = gareValideFiltered;
 		}
-		if(this.gareValide.size()>=200) 
+		if(this.gareValide.size()>=210) 
 			System.out.println(this.gareValide.size()+" valid entries - Slow recursion - Refine the filter selection");
-		else if(this.gareValide.size()<200 && this.gareValide.size()!=0)
+		else if(this.gareValide.size()<210 && this.gareValide.size()!=0)
 			System.out.println(this.gareValide.size()+" valid entries - Recursion can find solution in reasonable time");
 	}
 	

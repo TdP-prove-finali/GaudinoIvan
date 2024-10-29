@@ -18,7 +18,7 @@ public class DBConnect {
 			config.setJdbcUrl(jdbcURL);
 			config.setUsername("root");
 			// inserire la password per l'accesso al database
-			config.setPassword("rootMDB107");
+			config.setPassword("");
 			
 			// configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");

@@ -261,6 +261,9 @@ public class FXMLController {
     	if(this.livelloAbilita!=null) {
     		cmbLevel.setValue(this.livelloAbilita);
         	tabPane.getSelectionModel().select(tabMain);
+    	} else {
+    		lblLevel.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
+    		lblLevel.setText("Devi prima calcolare il tuo livello di abilità. Segui le istruzioni.");
     	}
     }
 
@@ -465,6 +468,7 @@ public class FXMLController {
 
     @FXML
     void doResetLevel(ActionEvent event) {
+    	lblLevel.setText("");
     	cmbYearR1.setValue(null);
     	cmbYearR2.setValue(null);
     	cmbYearR3.setValue(null);
